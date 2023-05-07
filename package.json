@@ -1,0 +1,29 @@
+{
+    "name": "forum-app-backend",
+    "version": "1.0.0",
+    "description": "The backend of a forum/social media app made with the MERN stack",
+    "main": "index.js",
+    "type": "module",
+    "private": "true",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node index.js",
+        "dev": "nodemon index.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/KSmith8888/Forum-App-Backend.git"
+    },
+    "author": "Kevyn Smith",
+    "bugs": {
+        "url": "https://github.com/KSmith8888/Forum-App-Backend/issues"
+    },
+    "homepage": "https://github.com/KSmith8888/Forum-App-Backend#readme",
+    "dependencies": {
+        "dotenv": "^16.0.3",
+        "express": "^4.18.2"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.22"
+    }
+}
