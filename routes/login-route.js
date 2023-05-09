@@ -1,10 +1,11 @@
 import express from "express";
 
-import { loginOptions, attemptLogin } from "../controllers/login-controller";
+import { attemptLogin } from "../controllers/login-controller";
+import { optionsPreflight } from "../controllers/options-preflight";
 
 const loginRouter = express.Router();
 
-loginRouter.options("/", loginOptions);
+loginRouter.options("/", optionsPreflight);
 loginRouter.post("/", attemptLogin);
 
 export { loginRouter };
