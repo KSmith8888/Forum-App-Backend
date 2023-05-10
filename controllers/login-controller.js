@@ -1,4 +1,4 @@
-import { wrapper } from "./wrapper";
+import { wrapper } from "./wrapper.js";
 
 const attemptLogin = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
