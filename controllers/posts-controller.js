@@ -6,7 +6,7 @@ const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic;
     const title = req.body.title;
     const content = req.body.content;
-    const allowedTopics = ["Movies", "Books", "Games"];
+    const allowedTopics = ["movies", "books", "games"];
     if (!allowedTopics.includes(topic)) {
         throw new Error("Bad Request Error: Topic not allowed");
     }
@@ -39,7 +39,9 @@ const getPost = wrapper(async (req, res) => {
 const getPostsByTopic = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postsTopic = req.params.topic;
-    const requestedPost = await Post.find({ topic: String(postsTopic) });
+    const requestedPost = await Post.find({ topic: String(postsTopic) }).limit(
+        20
+    );
     res.status(200);
     res.json(requestedPost);
 });
