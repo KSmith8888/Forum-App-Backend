@@ -23,4 +23,25 @@ const createPost = wrapper(async (req, res) => {
     res.json(dbPost);
 });
 
-export { createPost };
+const getPost = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const postId = req.params.id;
+    const requestedPost = await Post.findOne({ _id: String(postId) });
+    if (!requestedPost) {
+        throw new Error(
+            "Not Found Error: No post found with that id, it may have been deleted"
+        );
+    }
+    res.status(200);
+    res.json(requestedPost);
+});
+
+const getPostsByTopic = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const postsTopic = req.params.topic;
+    const requestedPost = await Post.find({ topic: String(postsTopic) });
+    res.status(200);
+    res.json(requestedPost);
+});
+
+export { createPost, getPost, getPostsByTopic };
