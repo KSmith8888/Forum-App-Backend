@@ -1,25 +1,25 @@
 import mongoose from "mongoose";
 const { Schema, model } = mongoose;
 
-const commentSchema = new Schema({
-    content: {
-        type: String,
-        required: true,
-        minlength: 4,
-        maxlength: 300,
-        trim: true,
+const commentSchema = new Schema(
+    {
+        content: {
+            type: String,
+            required: true,
+            minlength: 4,
+            maxlength: 300,
+            trim: true,
+        },
+        likes: {
+            type: Number,
+            required: true,
+            default: 0,
+        },
     },
-    time: {
-        type: Date,
-        required: true,
-        default: Date.now(),
-    },
-    likes: {
-        type: Number,
-        required: true,
-        default: 0,
-    },
-});
+    {
+        timestamps: true,
+    }
+);
 
 const Comment = model("Comment", commentSchema);
 
