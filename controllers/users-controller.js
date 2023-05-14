@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
 
 import { User } from "../models/user-model.js";
-import { wrapper } from "../middleware/wrapper.js";
+import { wrapper } from "./wrapper.js";
 
 const createNewUser = wrapper(async (req, res) => {
     res.header(

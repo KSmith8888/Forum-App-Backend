@@ -1,5 +1,6 @@
 import express from "express";
 
+import { optionsPreflight } from "../controllers/options-preflight.js";
 import { createNewUser } from "../controllers/users-controller.js";
 
 const usersRouter = express.Router();
