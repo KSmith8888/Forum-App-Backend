@@ -6,7 +6,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 4,
-        maxlength: 20,
+        maxlength: 18,
         unique: true,
         trim: true,
     },
@@ -14,7 +14,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 4,
-        maxlength: 20,
+        maxlength: 18,
         trim: true,
     },
     role: {
