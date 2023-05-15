@@ -4,7 +4,7 @@ import { User } from "../models/user-model.js";
 
 async function authorizeUser(req, res, next) {
     try {
-        const authHeader = req.authorization.split(" ");
+        const authHeader = req.headers.authorization.split(" ");
         if (authHeader[0] !== "Bearer") {
             throw new Error("Does not match required scheme");
         }
