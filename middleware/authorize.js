@@ -11,11 +11,15 @@ async function authorizeUser(req, res, next) {
         const token = authHeader[1];
         const decodedClient = jwt.verify(token, process.env.JWT_SECRET);
         const id = decodedClient.id;
+        const headerId = req.headers.user_id;
         const dbUser = await User.findOne({ _id: id });
         if (!dbUser) {
             throw new Error(
                 "Credential Error: No matching database user found"
             );
+        }
+        if (dbUser._id !== headerId) {
+            throw new Error("Credential Error: Header id does not match token");
         }
         req.userId = decodedClient.id;
         req.role = decodedClient.role;
