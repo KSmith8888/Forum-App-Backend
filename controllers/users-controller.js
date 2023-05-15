@@ -1,13 +1,11 @@
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 import { User } from "../models/user-model.js";
 import { wrapper } from "./wrapper.js";
 
 const createNewUser = wrapper(async (req, res) => {
-    res.header(
-        "Strict-Transport-Security",
-        "max-age=31536000; includeSubDomains"
-    );
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const username = req.body.username;
     const password = req.body.password;
     const requestedUsername = await User.findOne({
