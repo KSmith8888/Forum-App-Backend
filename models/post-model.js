@@ -11,7 +11,6 @@ const postSchema = new Schema(
             required: true,
             minlength: 4,
             maxlength: 60,
-            unique: true,
             trim: true,
         },
         content: {
@@ -31,8 +30,25 @@ const postSchema = new Schema(
             required: true,
             default: 0,
         },
+        user: {
+            type: String,
+            required: true,
+            minlength: 4,
+            maxlength: 18,
+            default: "User",
+        },
+        keywords: {
+            type: [String],
+            required: true,
+            default: [],
+        },
         comments: {
             type: [commentSchema],
+            required: true,
+            default: [],
+        },
+        history: {
+            type: [String],
             required: true,
             default: [],
         },

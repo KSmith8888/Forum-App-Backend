@@ -18,11 +18,12 @@ async function authorizeUser(req, res, next) {
                 "Credential Error: No matching database user found"
             );
         }
-        if (dbUser._id !== headerId) {
+        if (String(dbUser._id) !== headerId) {
             throw new Error("Credential Error: Header id does not match token");
         }
         req.userId = decodedClient.id;
         req.role = decodedClient.role;
+        req.username = decodedClient.username;
         next();
     } catch (err) {
         console.error(err);

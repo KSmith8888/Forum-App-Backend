@@ -7,6 +7,8 @@ const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic;
     const title = req.body.title;
     const content = req.body.content;
+    const username = req.username;
+    const keywords = req.body.keywords ? req.body.keywords.split(" ") : [];
     const allowedTopics = ["movies", "books", "games"];
     if (!allowedTopics.includes(topic)) {
         throw new Error("Bad Request Error: Topic not allowed");
@@ -14,13 +16,23 @@ const createPost = wrapper(async (req, res) => {
     if (!title || !content) {
         throw new Error("Bad Request Error: Title or content not provided");
     }
+    const dbUser = await User.findOne({ _id: req.userId });
     const dbPost = await Post.create({
         title: title,
         content: content,
         topic: topic,
+        user: username,
+        keywords: keywords,
     });
-    const dbUser = await User.findOne({ _id: req.userId });
-    dbUser.posts.push(dbPost._id);
+
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                posts: [...dbUser.posts, dbPost._id],
+            },
+        }
+    );
     res.status(201);
     res.json(dbPost);
 });
