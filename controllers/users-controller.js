@@ -21,7 +21,6 @@ const createNewUser = wrapper(async (req, res) => {
     const userInfo = {
         username: username,
         password: hashedPassword,
-        role: "user",
     };
     await User.create(userInfo);
     const dbUser = await User.findOne({

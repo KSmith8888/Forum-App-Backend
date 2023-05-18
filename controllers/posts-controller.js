@@ -60,4 +60,45 @@ const getPostsByTopic = wrapper(async (req, res) => {
     res.json(requestedPost);
 });
 
-export { createPost, getPost, getPostsByTopic };
+const getPostsByUser = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const userId = req.params.id;
+    const dbUser = await User.find({ _id: String(userId) });
+    if (!dbUser) {
+        throw new Error("No user account found, it may have been deleted");
+    }
+    const userPosts = dbUser.posts;
+    res.status(200);
+    res.json(userPosts);
+});
+
+const likePost = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const postId = req.params.id;
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.likedPosts.includes(postId)) {
+        throw new Error("You cannot like the same post more than once");
+    }
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                likedPosts: [...dbUser.likedPosts, postId],
+            },
+        }
+    );
+    const dbPost = await Post.findOne({ _id: String(postId) });
+    const numberOfLikes = dbPost.likes + 1;
+    await Post.findOneAndUpdate(
+        { _id: dbPost._id },
+        {
+            $set: {
+                likes: numberOfLikes,
+            },
+        }
+    );
+    res.status(200);
+    res.json({ status: "Post liked successfully" });
+});
+
+export { createPost, getPost, getPostsByTopic, getPostsByUser, likePost };

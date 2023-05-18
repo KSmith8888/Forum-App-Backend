@@ -6,7 +6,7 @@ const userSchema = new Schema({
         type: String,
         required: true,
         minlength: 4,
-        maxlength: 180,
+        maxlength: 18,
         unique: true,
         trim: true,
     },
@@ -19,10 +19,22 @@ const userSchema = new Schema({
     },
     role: {
         type: String,
+        required: true,
         default: "user",
     },
     posts: {
-        type: Array,
+        type: [String],
+        required: true,
+        default: [],
+    },
+    likedPosts: {
+        type: [String],
+        required: true,
+        default: [],
+    },
+    likedComments: {
+        type: [String],
+        required: true,
         default: [],
     },
 });

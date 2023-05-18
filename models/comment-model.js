@@ -15,6 +15,11 @@ const commentSchema = new Schema(
             required: true,
             default: 0,
         },
+        history: {
+            type: [String],
+            required: true,
+            default: [],
+        },
     },
     {
         timestamps: true,
