@@ -5,7 +5,7 @@ import { Post } from "../models/post-model.js";
 const createComment = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const content = req.body.content;
-    const postId = req.body.post;
+    const postId = req.body.postId;
     if (!content || !postId) {
         throw new Error("Bad Request Error: Content or post id not provided");
     }

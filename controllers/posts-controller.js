@@ -63,13 +63,13 @@ const getPostsByTopic = wrapper(async (req, res) => {
 const getPostsByUser = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const userId = req.params.id;
-    const dbUser = await User.find({ _id: String(userId) });
+    const dbUser = await User.findOne({ _id: String(userId) });
     if (!dbUser) {
         throw new Error("No user account found, it may have been deleted");
     }
-    const userPosts = dbUser.posts;
+    const userPostIds = dbUser.posts;
     res.status(200);
-    res.json(userPosts);
+    res.json(userPostIds);
 });
 
 const likePost = wrapper(async (req, res) => {
