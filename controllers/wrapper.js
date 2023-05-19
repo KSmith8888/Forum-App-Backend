@@ -19,6 +19,11 @@ const wrapper = (fn) => {
                 res.json({
                     msg: "Please provide all of the requested information in the correct format",
                 });
+            } else if (err.message.startsWith("Username unavailable Error:")) {
+                res.status(400);
+                res.json({
+                    msg: "Sorry, that username is not available. Please choose a different username",
+                });
             } else {
                 res.status(500);
                 res.json({

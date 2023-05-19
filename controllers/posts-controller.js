@@ -29,7 +29,10 @@ const createPost = wrapper(async (req, res) => {
         { _id: dbUser._id },
         {
             $set: {
-                posts: [...dbUser.posts, dbPost._id],
+                posts: [
+                    ...dbUser.posts,
+                    { id: dbPost._id, title: dbPost.title },
+                ],
             },
         }
     );

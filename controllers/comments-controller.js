@@ -11,6 +11,7 @@ const createComment = wrapper(async (req, res) => {
     }
     const dbComment = await Comment.create({
         content: content,
+        relatedPost: postId,
     });
     const dbPost = await Post.findOne({ _id: postId });
     await Post.findOneAndUpdate(
@@ -25,4 +26,33 @@ const createComment = wrapper(async (req, res) => {
     res.json(dbComment);
 });
 
-export { createComment };
+const likeComment = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const commentId = req.params.id;
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.likedComments.includes(commentId)) {
+        throw new Error("You cannot like the same comment more than once");
+    }
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                likedComments: [...dbUser.likedComments, commentId],
+            },
+        }
+    );
+    const dbComment = await Post.findOne({ _id: String(commentId) });
+    const numberOfLikes = dbComment.likes + 1;
+    await Post.findOneAndUpdate(
+        { _id: dbComment._id },
+        {
+            $set: {
+                likes: numberOfLikes,
+            },
+        }
+    );
+    res.status(200);
+    res.json({ status: "Comment liked successfully" });
+});
+
+export { createComment, likeComment };

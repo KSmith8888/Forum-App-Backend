@@ -47,6 +47,11 @@ const postSchema = new Schema(
             required: true,
             default: [],
         },
+        hasBeenEdited: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
         history: {
             type: [String],
             required: true,

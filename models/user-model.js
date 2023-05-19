@@ -23,7 +23,7 @@ const userSchema = new Schema({
         default: "user",
     },
     posts: {
-        type: [String],
+        type: [Object],
         required: true,
         default: [],
     },

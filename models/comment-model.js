@@ -15,6 +15,15 @@ const commentSchema = new Schema(
             required: true,
             default: 0,
         },
+        relatedPost: {
+            type: String,
+            required: true,
+        },
+        hasBeenEdited: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
         history: {
             type: [String],
             required: true,
