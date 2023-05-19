@@ -101,7 +101,7 @@ const likePost = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ status: "Post liked successfully" });
+    res.json({ status: "Post liked successfully", likes: numberOfLikes });
 });
 
 export { createPost, getPost, getPostsByTopic, getPostsByUser, likePost };

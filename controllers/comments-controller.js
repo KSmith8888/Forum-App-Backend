@@ -1,6 +1,7 @@
 import { wrapper } from "./wrapper.js";
 import { Comment } from "../models/comment-model.js";
 import { Post } from "../models/post-model.js";
+import { User } from "../models/user-model.js";
 
 const createComment = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
@@ -52,7 +53,7 @@ const likeComment = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ status: "Comment liked successfully" });
+    res.json({ status: "Comment liked successfully", likes: numberOfLikes });
 });
 
 export { createComment, likeComment };
