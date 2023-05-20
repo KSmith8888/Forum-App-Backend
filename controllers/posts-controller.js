@@ -79,19 +79,28 @@ const likePost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
+    //Did user like post or unlike
+    let didUserLike = true;
+    let newLikedPosts = [];
     if (dbUser.likedPosts.includes(postId)) {
-        throw new Error("You cannot like the same post more than once");
+        didUserLike = false;
+        newLikedPosts = dbUser.likedPosts.filter((id) => {
+            return id !== postId;
+        });
+    } else {
+        newLikedPosts = [...dbUser.likedPosts, postId];
     }
     await User.findOneAndUpdate(
         { _id: dbUser._id },
         {
             $set: {
-                likedPosts: [...dbUser.likedPosts, postId],
+                likedPosts: newLikedPosts,
             },
         }
     );
+
     const dbPost = await Post.findOne({ _id: String(postId) });
-    const numberOfLikes = dbPost.likes + 1;
+    const numberOfLikes = didUserLike ? dbPost.likes + 1 : dbPost.likes - 1;
     await Post.findOneAndUpdate(
         { _id: dbPost._id },
         {
@@ -101,7 +110,11 @@ const likePost = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ status: "Post liked successfully", likes: numberOfLikes });
+    res.json({
+        status: "Post liked successfully",
+        likes: numberOfLikes,
+        didUserLike,
+    });
 });
 
 export { createPost, getPost, getPostsByTopic, getPostsByUser, likePost };

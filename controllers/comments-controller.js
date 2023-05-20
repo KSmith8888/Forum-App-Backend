@@ -31,20 +31,30 @@ const likeComment = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const commentId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
+    //Did user like comment or unlike
+    let didUserLike = true;
+    let newLikedComments = [];
     if (dbUser.likedComments.includes(commentId)) {
-        throw new Error("You cannot like the same comment more than once");
+        didUserLike = false;
+        newLikedComments = dbUser.likedComments.filter((id) => {
+            return id !== commentId;
+        });
+    } else {
+        newLikedComments = [...dbUser.likedComments, commentId];
     }
     await User.findOneAndUpdate(
         { _id: dbUser._id },
         {
             $set: {
-                likedComments: [...dbUser.likedComments, commentId],
+                likedComments: newLikedComments,
             },
         }
     );
-    const dbComment = await Post.findOne({ _id: String(commentId) });
-    const numberOfLikes = dbComment.likes + 1;
-    await Post.findOneAndUpdate(
+    const dbComment = await Comment.findOne({ _id: String(commentId) });
+    const numberOfLikes = didUserLike
+        ? dbComment.likes + 1
+        : dbComment.likes - 1;
+    const newComment = await Comment.findOneAndUpdate(
         { _id: dbComment._id },
         {
             $set: {
@@ -52,8 +62,30 @@ const likeComment = wrapper(async (req, res) => {
             },
         }
     );
+    const dbPost = await Post.findOne({ _id: dbComment.relatedPost });
+    const newPostComments = dbPost.comments.map((comment) => {
+        if (comment._id !== commentId) {
+            return comment;
+        } else {
+            return newComment;
+        }
+    });
+    console.log(newPostComments);
+    await Post.findOneAndUpdate(
+        { _id: dbPost._id },
+        {
+            $set: {
+                comments: newPostComments,
+            },
+        }
+    );
+    dbPost.save();
     res.status(200);
-    res.json({ status: "Comment liked successfully", likes: numberOfLikes });
+    res.json({
+        status: "Comment liked successfully",
+        likes: numberOfLikes,
+        didUserLike,
+    });
 });
 
 export { createComment, likeComment };
