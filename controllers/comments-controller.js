@@ -19,7 +19,7 @@ const createComment = wrapper(async (req, res) => {
         { _id: postId },
         {
             $set: {
-                comments: [...dbPost.comments, dbComment],
+                comments: [...dbPost.comments, dbComment._id],
             },
         }
     );
