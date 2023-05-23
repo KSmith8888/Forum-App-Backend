@@ -70,7 +70,6 @@ const likeComment = wrapper(async (req, res) => {
             return newComment;
         }
     });
-    console.log(newPostComments);
     await Post.findOneAndUpdate(
         { _id: dbPost._id },
         {

@@ -10,7 +10,7 @@ const createPost = wrapper(async (req, res) => {
     const content = req.body.content;
     const username = req.username;
     const keywords = req.body.keywords ? req.body.keywords.split(" ") : [];
-    const allowedTopics = ["movies", "books", "games"];
+    const allowedTopics = ["movies", "books", "games", "other"];
     if (!allowedTopics.includes(topic)) {
         throw new Error("Bad Request Error: Topic not allowed");
     }
@@ -56,7 +56,6 @@ const getPost = wrapper(async (req, res) => {
         const matching = await Comment.findOne({ _id: String(id) });
         relatedComments.push(matching);
     }
-    console.log(relatedComments, requestedPost);
     res.status(200);
     res.json({ post: requestedPost, comments: relatedComments });
 });
