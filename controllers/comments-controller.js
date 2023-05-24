@@ -14,6 +14,16 @@ const createComment = wrapper(async (req, res) => {
         content: content,
         relatedPost: postId,
     });
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    const newComments = [...dbUser.comments, dbComment._id];
+    await User.findOneAndUpdate(
+        { _id: req.userId },
+        {
+            $set: {
+                comments: newComments,
+            },
+        }
+    );
     const dbPost = await Post.findOne({ _id: postId });
     await Post.findOneAndUpdate(
         { _id: postId },
@@ -87,4 +97,16 @@ const likeComment = wrapper(async (req, res) => {
     });
 });
 
-export { createComment, likeComment };
+const editComment = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const commentId = req.params.id;
+    console.log(commentId);
+});
+
+const deleteComment = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const commentId = req.params.id;
+    console.log(commentId);
+});
+
+export { createComment, likeComment, editComment, deleteComment };

@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { wrapper } from "./wrapper.js";
 import { Post } from "../models/post-model.js";
 import { User } from "../models/user-model.js";
@@ -77,9 +79,25 @@ const getPostsByUser = wrapper(async (req, res) => {
     if (!dbUser) {
         throw new Error("No user account found, it may have been deleted");
     }
-    const userPostIds = dbUser.posts;
+    const commentObjectIds = dbUser.comments.map((id) => {
+        return new mongoose.Types.ObjectId(id);
+    });
+    const userComments = await Comment.find({
+        _id: {
+            $in: commentObjectIds,
+        },
+    });
+    const userPostData = dbUser.posts;
     res.status(200);
-    res.json(userPostIds);
+    res.json({ posts: userPostData, comments: userComments });
+});
+
+const getPostsByQuery = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const query = req.params.query;
+    const results = await Post.find({ keywords: query }).limit(20);
+    res.status(200);
+    res.json(results);
 });
 
 const likePost = wrapper(async (req, res) => {
@@ -124,4 +142,25 @@ const likePost = wrapper(async (req, res) => {
     });
 });
 
-export { createPost, getPost, getPostsByTopic, getPostsByUser, likePost };
+const editPost = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const postId = req.params.id;
+    console.log(postId);
+});
+
+const deletePost = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const postId = req.params.id;
+    console.log(postId);
+});
+
+export {
+    createPost,
+    getPost,
+    getPostsByTopic,
+    getPostsByUser,
+    likePost,
+    getPostsByQuery,
+    editPost,
+    deletePost,
+};
