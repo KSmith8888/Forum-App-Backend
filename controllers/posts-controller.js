@@ -11,7 +11,10 @@ const createPost = wrapper(async (req, res) => {
     const title = req.body.title;
     const content = req.body.content;
     const username = req.username;
-    const keywords = req.body.keywords ? req.body.keywords.split(" ") : [];
+    const initialKeywords = req.body.keywords
+        ? req.body.keywords.split(" ")
+        : [];
+    const keywords = initialKeywords.map((keyword) => keyword.toLowerCase());
     const allowedTopics = ["movies", "books", "games", "other"];
     if (!allowedTopics.includes(topic)) {
         throw new Error("Bad Request Error: Topic not allowed");
@@ -94,7 +97,10 @@ const getPostsByUser = wrapper(async (req, res) => {
 
 const getPostsByQuery = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const query = req.params.query;
+    if (!req.params.query) {
+        throw new Error("User did not submit a valid query");
+    }
+    const query = req.params.query.toLowerCase();
     const results = await Post.find({ keywords: query }).limit(20);
     res.status(200);
     res.json(results);
@@ -145,13 +151,52 @@ const likePost = wrapper(async (req, res) => {
 const editPost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
-    console.log(postId);
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    const postObjectIds = dbUser.posts.map((postObj) => {
+        return new mongoose.Types.ObjectId(postObj.id);
+    });
+    const didUserCreatePost = await Post.find({
+        _id: {
+            $in: postObjectIds,
+        },
+    });
+    if (!didUserCreatePost) {
+        throw new Error("Users can only edit their own posts");
+    }
+    console.log(didUserCreatePost);
+    res.status(200);
+    res.json({ message: "Post edited successfully" });
 });
 
 const deletePost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
-    console.log(postId);
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    const postObjectIds = dbUser.posts.map((postObj) => {
+        return new mongoose.Types.ObjectId(postObj.id);
+    });
+    const didUserCreatePost = await Post.find({
+        _id: {
+            $in: postObjectIds,
+        },
+    });
+    if (!didUserCreatePost) {
+        throw new Error("Users can only delete their own posts");
+    }
+    const newUserPosts = dbUser.posts.filter((postObj) => {
+        return String(postObj.id) !== postId;
+    });
+    await User.findOneAndUpdate(
+        { _id: String(req.userId) },
+        {
+            $set: {
+                posts: newUserPosts,
+            },
+        }
+    );
+    await Post.findOneAndDelete({ _id: postId });
+    res.status(200);
+    res.json({ message: "Post deleted successfully" });
 });
 
 export {

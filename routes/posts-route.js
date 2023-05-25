@@ -15,7 +15,7 @@ import { authorizeUser } from "../middleware/authorize.js";
 
 const postsRouter = express.Router();
 
-postsRouter.options("/", optionsPreflight);
+postsRouter.options("*", optionsPreflight);
 postsRouter.post("/create", authorizeUser, createPost);
 postsRouter.patch("/likes/:id", authorizeUser, likePost);
 postsRouter.get("/:topic", getPostsByTopic);

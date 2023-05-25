@@ -15,6 +15,13 @@ const commentSchema = new Schema(
             required: true,
             default: 0,
         },
+        user: {
+            type: String,
+            required: true,
+            minlength: 4,
+            maxlength: 18,
+            default: "User",
+        },
         relatedPost: {
             type: String,
             required: true,
