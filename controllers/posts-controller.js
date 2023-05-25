@@ -19,10 +19,12 @@ const createPost = wrapper(async (req, res) => {
     if (!allowedTopics.includes(topic)) {
         throw new Error("Bad Request Error: Topic not allowed");
     }
+    keywords.push(topic);
     if (!title || !content) {
         throw new Error("Bad Request Error: Title or content not provided");
     }
     const dbUser = await User.findOne({ _id: req.userId });
+    keywords.push(dbUser.username.toLowerCase);
     const dbPost = await Post.create({
         title: title,
         content: content,
@@ -194,7 +196,17 @@ const deletePost = wrapper(async (req, res) => {
             },
         }
     );
-    await Post.findOneAndDelete({ _id: postId });
+    await Post.findOneAndUpdate(
+        { _id: postId },
+        {
+            $set: {
+                user: "Deleted",
+                content: "This post has been deleted",
+                keywords: [],
+                history: [],
+            },
+        }
+    );
     res.status(200);
     res.json({ message: "Post deleted successfully" });
 });

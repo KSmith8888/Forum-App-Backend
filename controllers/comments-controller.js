@@ -122,6 +122,7 @@ const editComment = wrapper(async (req, res) => {
 const deleteComment = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const commentId = req.params.id;
+    const dbComment = await Comment.findOne({ _id: commentId });
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const commentObjectIds = dbUser.comments.map((id) => {
         return new mongoose.Types.ObjectId(id);
@@ -142,6 +143,18 @@ const deleteComment = wrapper(async (req, res) => {
         {
             $set: {
                 comments: newUserComments,
+            },
+        }
+    );
+    const relatedPost = await Post.findOne({ _id: dbComment.relatedPost });
+    const newPostComments = relatedPost.comments.filter((id) => {
+        return id !== commentId;
+    });
+    await Post.findOneAndUpdate(
+        { _id: relatedPost._id },
+        {
+            $set: {
+                comments: newPostComments,
             },
         }
     );
