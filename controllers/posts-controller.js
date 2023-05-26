@@ -153,37 +153,49 @@ const likePost = wrapper(async (req, res) => {
 const editPost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
+    const dbPost = await Post.find({ _id: postId });
+    if (!dbPost) {
+        throw new Error("No post found matching that id");
+    }
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    const postObjectIds = dbUser.posts.map((postObj) => {
-        return new mongoose.Types.ObjectId(postObj.id);
+    const userPostIds = dbUser.posts.map((postObj) => {
+        return String(postObj.id);
     });
-    const didUserCreatePost = await Post.find({
-        _id: {
-            $in: postObjectIds,
-        },
-    });
-    if (!didUserCreatePost) {
+    if (!userPostIds.includes(postId)) {
         throw new Error("Users can only edit their own posts");
     }
-    console.log(didUserCreatePost);
+    const prevPostHistory = dbPost.history || [];
+    const prevPostTitle = dbPost.title;
+    const prevPostContent = dbPost.content;
+    const prevPostVersion = { title: prevPostTitle, content: prevPostContent };
+    const newPostTitle = req.body.title;
+    const newPostContent = req.body.content;
+    if (!newPostTitle || !newPostContent) {
+        throw new Error("No post title or content was provided");
+    }
+    await Post.findOneAndUpdate(
+        { _id: postId },
+        {
+            $set: {
+                title: newPostTitle,
+                content: newPostContent,
+                history: [...prevPostHistory, prevPostVersion],
+            },
+        }
+    );
     res.status(200);
     res.json({ message: "Post edited successfully" });
 });
 
 const deletePost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const postId = req.params.id;
+    const postId = String(req.params.id);
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    const postObjectIds = dbUser.posts.map((postObj) => {
-        return new mongoose.Types.ObjectId(postObj.id);
+    const userPostIds = dbUser.posts.map((postObj) => {
+        return String(postObj.id);
     });
-    const didUserCreatePost = await Post.find({
-        _id: {
-            $in: postObjectIds,
-        },
-    });
-    if (!didUserCreatePost) {
-        throw new Error("Users can only delete their own posts");
+    if (!userPostIds.includes(postId)) {
+        throw new Error("Users can only edit their own posts");
     }
     const newUserPosts = dbUser.posts.filter((postObj) => {
         return String(postObj.id) !== postId;

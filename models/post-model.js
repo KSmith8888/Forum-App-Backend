@@ -51,7 +51,7 @@ const postSchema = new Schema(
             default: false,
         },
         history: {
-            type: [String],
+            type: [Object],
             required: true,
             default: [],
         },
