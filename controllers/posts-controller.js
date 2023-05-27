@@ -179,6 +179,7 @@ const editPost = wrapper(async (req, res) => {
             $set: {
                 title: newPostTitle,
                 content: newPostContent,
+                hasBeenEdited: true,
                 history: [...prevPostHistory, prevPostVersion],
             },
         }

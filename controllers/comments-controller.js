@@ -40,6 +40,19 @@ const createComment = wrapper(async (req, res) => {
     res.json(dbComment);
 });
 
+const getComment = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const commentId = req.params.id;
+    const requestedComment = await Comment.findOne({ _id: String(commentId) });
+    if (!requestedComment) {
+        throw new Error(
+            "Not Found Error: No comment found with that id, it may have been deleted"
+        );
+    }
+    res.status(200);
+    res.json(requestedComment);
+});
+
 const likeComment = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const commentId = req.params.id;
@@ -101,22 +114,33 @@ const likeComment = wrapper(async (req, res) => {
 
 const editComment = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const commentId = req.params.id;
+    const commentId = String(req.params.id);
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    const commentObjectIds = dbUser.comments.map((id) => {
-        return new mongoose.Types.ObjectId(id);
+    const userCommentIds = dbUser.comments.map((id) => {
+        return String(id);
     });
-    const didUserCreateComment = await Comment.find({
-        _id: {
-            $in: commentObjectIds,
-        },
-    });
-    if (!didUserCreateComment) {
+    if (!userCommentIds.includes(commentId)) {
         throw new Error("Users can only edit their own comments");
     }
-    console.log(didUserCreateComment);
+    const newContent = req.body.content;
+    if (!newContent) {
+        throw new Error("Updated content not provided");
+    }
+    const dbComment = await Comment.findOne({ _id: commentId });
+    const prevContent = dbComment.content;
+    const prevHistory = dbComment.history || [];
+    await Comment.findOneAndUpdate(
+        { _id: dbComment._id },
+        {
+            $set: {
+                content: newContent,
+                hasBeenEdited: true,
+                history: [...prevHistory, prevContent],
+            },
+        }
+    );
     res.status(200);
-    res.json({ message: "Comment edited successfully" });
+    res.json({ relatedPostId: dbComment.relatedPost });
 });
 
 const deleteComment = wrapper(async (req, res) => {
@@ -124,16 +148,11 @@ const deleteComment = wrapper(async (req, res) => {
     const commentId = req.params.id;
     const dbComment = await Comment.findOne({ _id: commentId });
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    const commentObjectIds = dbUser.comments.map((id) => {
-        return new mongoose.Types.ObjectId(id);
+    const userCommentIds = dbUser.comments.map((id) => {
+        return String(id);
     });
-    const didUserCreateComment = await Comment.find({
-        _id: {
-            $in: commentObjectIds,
-        },
-    });
-    if (!didUserCreateComment) {
-        throw new Error("Users can only delete their own comments");
+    if (!userCommentIds.includes(commentId)) {
+        throw new Error("Users can only edit their own comments");
     }
     const newUserComments = dbUser.comments.filter((id) => {
         return String(id) !== commentId;
@@ -163,4 +182,4 @@ const deleteComment = wrapper(async (req, res) => {
     res.json({ message: "Comment deleted successfully" });
 });
 
-export { createComment, likeComment, editComment, deleteComment };
+export { createComment, getComment, likeComment, editComment, deleteComment };

@@ -2,6 +2,7 @@ import express from "express";
 
 import {
     createComment,
+    getComment,
     likeComment,
     editComment,
     deleteComment,
@@ -12,6 +13,7 @@ import { authorizeUser } from "../middleware/authorize.js";
 const commentsRouter = express.Router();
 
 commentsRouter.options("*", optionsPreflight);
+commentsRouter.get("/details/:id", getComment);
 commentsRouter.post("/create", authorizeUser, createComment);
 commentsRouter.patch("/likes/:id", authorizeUser, likeComment);
 commentsRouter.patch("/details/:id", authorizeUser, editComment);
