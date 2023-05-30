@@ -3,6 +3,7 @@ import express from "express";
 import {
     createPost,
     getPost,
+    getPostsByLikes,
     getPostsByTopic,
     getPostsByUser,
     likePost,
@@ -18,6 +19,7 @@ const postsRouter = express.Router();
 postsRouter.options("*", optionsPreflight);
 postsRouter.post("/create", authorizeUser, createPost);
 postsRouter.patch("/likes/:id", authorizeUser, likePost);
+postsRouter.get("/popular", getPostsByLikes);
 postsRouter.get("/:topic", getPostsByTopic);
 postsRouter.get("/details/:id", getPost);
 postsRouter.get("/user/:id", getPostsByUser);

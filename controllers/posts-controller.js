@@ -108,6 +108,13 @@ const getPostsByQuery = wrapper(async (req, res) => {
     res.json(results);
 });
 
+const getPostsByLikes = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const popularPosts = await Post.find({}).sort({ likes: "desc" }).limit(10);
+    res.status(200);
+    res.json(popularPosts);
+});
+
 const likePost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
@@ -227,6 +234,7 @@ const deletePost = wrapper(async (req, res) => {
 export {
     createPost,
     getPost,
+    getPostsByLikes,
     getPostsByTopic,
     getPostsByUser,
     likePost,
