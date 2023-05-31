@@ -159,8 +159,8 @@ const likePost = wrapper(async (req, res) => {
 
 const editPost = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const postId = req.params.id;
-    const dbPost = await Post.find({ _id: postId });
+    const postId = String(req.params.id);
+    const dbPost = await Post.findOne({ _id: postId });
     if (!dbPost) {
         throw new Error("No post found matching that id");
     }
@@ -180,6 +180,21 @@ const editPost = wrapper(async (req, res) => {
     if (!newPostTitle || !newPostContent) {
         throw new Error("No post title or content was provided");
     }
+    const newUserPosts = dbUser.posts.map((postObj) => {
+        if (String(postObj.id) === postId) {
+            return { title: newPostTitle, id: postId };
+        } else {
+            return postObj;
+        }
+    });
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                posts: newUserPosts,
+            },
+        }
+    );
     await Post.findOneAndUpdate(
         { _id: postId },
         {
