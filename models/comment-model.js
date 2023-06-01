@@ -8,7 +8,6 @@ const commentSchema = new Schema(
             required: true,
             minlength: 4,
             maxlength: 300,
-            trim: true,
         },
         likes: {
             type: Number,
@@ -32,7 +31,7 @@ const commentSchema = new Schema(
             default: false,
         },
         history: {
-            type: [String],
+            type: [Object],
             required: true,
             default: [],
         },

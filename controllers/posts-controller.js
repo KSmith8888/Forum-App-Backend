@@ -24,7 +24,7 @@ const createPost = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Title or content not provided");
     }
     const dbUser = await User.findOne({ _id: req.userId });
-    keywords.push(dbUser.username.toLowerCase);
+    keywords.push(dbUser.username.toLowerCase());
     const dbPost = await Post.create({
         title: title,
         content: content,
@@ -174,11 +174,19 @@ const editPost = wrapper(async (req, res) => {
     const prevPostHistory = dbPost.history || [];
     const prevPostTitle = dbPost.title;
     const prevPostContent = dbPost.content;
-    const prevPostVersion = { title: prevPostTitle, content: prevPostContent };
-    const newPostTitle = req.body.title;
+    const prevTimestamp =
+        dbPost.createdAt !== dbPost.updatedAt
+            ? dbPost.updatedAt
+            : dbPost.createdAt;
+    const prevPostVersion = {
+        title: prevPostTitle,
+        content: prevPostContent,
+        timestamp: prevTimestamp,
+    };
+    const newPostTitle = req.body.title || prevPostTitle;
     const newPostContent = req.body.content;
-    if (!newPostTitle || !newPostContent) {
-        throw new Error("No post title or content was provided");
+    if (!newPostContent) {
+        throw new Error("No post content was provided");
     }
     const newUserPosts = dbUser.posts.map((postObj) => {
         if (String(postObj.id) === postId) {
@@ -239,6 +247,7 @@ const deletePost = wrapper(async (req, res) => {
                 content: "This post has been deleted",
                 keywords: [],
                 history: [],
+                hasBeenEdited: false,
             },
         }
     );

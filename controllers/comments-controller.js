@@ -128,6 +128,11 @@ const editComment = wrapper(async (req, res) => {
     }
     const dbComment = await Comment.findOne({ _id: commentId });
     const prevContent = dbComment.content;
+    const prevTimestamp =
+        dbComment.createdAt !== dbComment.updatedAt
+            ? dbComment.updatedAt
+            : dbComment.createdAt;
+    const prevComment = { content: prevContent, timestamp: prevTimestamp };
     const prevHistory = dbComment.history || [];
     await Comment.findOneAndUpdate(
         { _id: dbComment._id },
@@ -135,7 +140,7 @@ const editComment = wrapper(async (req, res) => {
             $set: {
                 content: newContent,
                 hasBeenEdited: true,
-                history: [...prevHistory, prevContent],
+                history: [...prevHistory, prevComment],
             },
         }
     );
