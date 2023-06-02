@@ -3,7 +3,7 @@ const wrapper = (fn) => {
         try {
             await fn(req, res, next);
         } catch (err) {
-            console.error(err);
+            console.error(err.message);
             if (err.message.startsWith("Credential Error:")) {
                 res.status(401);
                 res.json({
