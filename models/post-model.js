@@ -54,6 +54,16 @@ const postSchema = new Schema(
             required: true,
             default: [],
         },
+        profileImageName: {
+            type: String,
+            required: true,
+            default: "blank.png",
+        },
+        profileImageAlt: {
+            type: String,
+            required: true,
+            default: "A generic blank avatar image of a mans head",
+        },
     },
     {
         timestamps: true,

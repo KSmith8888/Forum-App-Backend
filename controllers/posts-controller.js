@@ -31,6 +31,8 @@ const createPost = wrapper(async (req, res) => {
         topic: topic,
         user: username,
         keywords: keywords,
+        profileImageName: dbUser.profileImageName,
+        profileImageAlt: dbUser.profileImageAlt,
     });
 
     await User.findOneAndUpdate(

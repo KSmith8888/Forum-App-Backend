@@ -10,19 +10,28 @@ function sanitizeChars(req, res, next) {
         }
         const bodyValues = Object.values(req.body);
         for (let value of bodyValues) {
+            if (typeof value !== "string" && typeof value !== "object") {
+                throw new Error("User input not valid: Not accepted type");
+            }
+            if (value === "") {
+                value = undefined;
+            }
+            if (typeof value === "object" && !Array.isArray(value)) {
+                throw new Error("User input not valid: Non-array object");
+            }
             if (Array.isArray(value)) {
                 value.forEach((str) => {
                     if (!reg.test(str)) {
-                        throw new Error("User input not valid");
+                        throw new Error("User input not valid: Array input");
                     }
                 });
-            } else if (!reg.test(value)) {
-                throw new Error("User input not valid");
+            } else if (typeof value === "string" && !reg.test(value)) {
+                throw new Error("User input not valid: String input");
             }
         }
         next();
     } catch (err) {
-        console.error(err);
+        console.error(err.message);
         res.status(400);
         res.json({
             msg: "Please do not include special characters in your request",
