@@ -27,4 +27,22 @@ const createNewUser = wrapper(async (req, res) => {
     });
 });
 
-export { createNewUser };
+const updateProfilePic = wrapper(async (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    const userId = req.userId;
+    const newProfilePicName = req.body.name;
+    const newProfilePicAlt = req.body.alt;
+    await User.findOneAndUpdate(
+        { _id: userId },
+        {
+            $set: {
+                profileImageName: newProfilePicName,
+                profileImageAlt: newProfilePicAlt,
+            },
+        }
+    );
+    res.status(200);
+    res.json({ status: "Profile picture updated successfully" });
+});
+
+export { createNewUser, updateProfilePic };
