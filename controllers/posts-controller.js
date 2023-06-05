@@ -10,7 +10,7 @@ const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic;
     const title = req.body.title;
     const content = req.body.content;
-    const username = req.username;
+    const displayName = req.username.toLowerCase();
     const initialKeywords = req.body.keywords
         ? req.body.keywords.split(" ")
         : [];
@@ -29,7 +29,7 @@ const createPost = wrapper(async (req, res) => {
         title: title,
         content: content,
         topic: topic,
-        user: username,
+        user: displayName,
         keywords: keywords,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,

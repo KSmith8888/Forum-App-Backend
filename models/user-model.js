@@ -22,6 +22,14 @@ const userSchema = new Schema({
         required: true,
         default: "user",
     },
+    displayName: {
+        type: String,
+        required: true,
+        minlength: 4,
+        maxlength: 18,
+        unique: true,
+        trim: true,
+    },
     posts: {
         type: [Object],
         required: true,

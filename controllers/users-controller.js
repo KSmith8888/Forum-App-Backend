@@ -5,19 +5,21 @@ import { wrapper } from "./wrapper.js";
 
 const createNewUser = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const username = req.body.username;
+    const displayName = req.body.username;
+    const username = displayName.toLowerCase();
     const password = req.body.password;
     const requestedUsername = await User.findOne({
-        username: String(username),
+        username: username,
     });
-    if (requestedUsername) {
-        throw new Error("Username unavailable Error:");
+    if (requestedUsername?.username) {
+        throw new Error("Username unavailable Error: Duplicate entry");
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
     const userInfo = {
         username: username,
         password: hashedPassword,
+        displayName: displayName,
     };
     await User.create(userInfo);
 

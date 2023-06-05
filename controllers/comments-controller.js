@@ -16,7 +16,7 @@ const createComment = wrapper(async (req, res) => {
     const dbComment = await Comment.create({
         content: content,
         relatedPost: postId,
-        user: dbUser.username,
+        user: dbUser.displayName,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
     });
