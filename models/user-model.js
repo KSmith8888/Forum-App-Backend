@@ -50,7 +50,7 @@ const userSchema = new Schema({
     profileImageAlt: {
         type: String,
         required: true,
-        default: "A generic blank avatar image of a mans head",
+        default: "A generic, blank outline of a mans upper body",
     },
 });
 
