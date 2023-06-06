@@ -12,7 +12,7 @@ const attemptLogin = wrapper(async (req, res) => {
         throw new Error("Credential Error: Username or password not provided");
     }
     const dbUser = await User.findOne({
-        username: String(attemptUsername),
+        username: attemptUsername.toLowerCase(),
     });
     if (!dbUser) {
         throw new Error(
