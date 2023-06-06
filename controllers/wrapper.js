@@ -4,6 +4,10 @@ const wrapper = (fn) => {
             await fn(req, res, next);
         } catch (err) {
             console.error(err.message);
+            res.header(
+                "Access-Control-Allow-Origin",
+                process.env.FRONTEND_ORIGIN
+            );
             if (err.message.startsWith("Credential Error:")) {
                 res.status(401);
                 res.json({
