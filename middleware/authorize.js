@@ -4,9 +4,16 @@ import { User } from "../models/user-model.js";
 
 async function authorizeUser(req, res, next) {
     try {
+        if (!req.headers.authorization) {
+            throw new Error(
+                "Authorization Error: No authorization header present"
+            );
+        }
         const authHeader = req.headers.authorization.split(" ");
         if (authHeader[0] !== "Bearer") {
-            throw new Error("Does not match required scheme");
+            throw new Error(
+                "Authorization Error: Does not match required scheme"
+            );
         }
         const token = authHeader[1];
         const decodedClient = jwt.verify(token, process.env.JWT_SECRET);
@@ -21,16 +28,33 @@ async function authorizeUser(req, res, next) {
         if (String(dbUser._id) !== headerId) {
             throw new Error("Credential Error: Header id does not match token");
         }
-        req.userId = decodedClient.id;
-        req.role = decodedClient.role;
-        req.username = decodedClient.username;
+        req.userId = String(decodedClient.id);
+        req.role = String(decodedClient.role);
+        req.username = String(decodedClient.username);
         next();
     } catch (err) {
-        console.error(err);
-        res.status(500);
-        res.json({
-            msg: "There has been an error, please try again later",
-        });
+        console.error(err.message);
+        if (err.message.startsWith("Authorization Error:")) {
+            res.status(401);
+            res.json({
+                msg: "You must log in before performing that action",
+            });
+        } else if (err.message === "jwt expired") {
+            res.status(401);
+            res.json({
+                msg: "You have been automatically logged out, please log back in to access this resource",
+            });
+        } else if (err.message.startsWith("Credential Error:")) {
+            res.status(400);
+            res.json({
+                msg: "Provided credentials do not match",
+            });
+        } else {
+            res.status(500);
+            res.json({
+                msg: "There has been an error, please try again later",
+            });
+        }
     }
 }
 

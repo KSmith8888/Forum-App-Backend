@@ -6,7 +6,6 @@ import { User } from "../models/user-model.js";
 import { Comment } from "../models/comment-model.js";
 
 const createPost = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const topic = req.body.topic;
     const title = req.body.title;
     const content = req.body.content;
@@ -24,7 +23,7 @@ const createPost = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Title or content not provided");
     }
     const dbUser = await User.findOne({ _id: req.userId });
-    keywords.push(dbUser.username.toLowerCase());
+    keywords.push(dbUser.username);
     const dbPost = await Post.create({
         title: title,
         content: content,
@@ -51,7 +50,6 @@ const createPost = wrapper(async (req, res) => {
 });
 
 const getPost = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
     const requestedPost = await Post.findOne({ _id: String(postId) });
     if (!requestedPost) {
@@ -70,8 +68,7 @@ const getPost = wrapper(async (req, res) => {
 });
 
 const getPostsByTopic = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const postsTopic = req.params.topic;
+    const postsTopic = req.params.topic.toLowerCase();
     const requestedPost = await Post.find({ topic: String(postsTopic) }).limit(
         20
     );
@@ -80,7 +77,6 @@ const getPostsByTopic = wrapper(async (req, res) => {
 });
 
 const getPostsByUser = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const userId = req.params.id;
     const dbUser = await User.findOne({ _id: String(userId) });
     if (!dbUser) {
@@ -100,7 +96,6 @@ const getPostsByUser = wrapper(async (req, res) => {
 });
 
 const getPostsByQuery = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     if (!req.params.query) {
         throw new Error("User did not submit a valid query");
     }
@@ -111,14 +106,12 @@ const getPostsByQuery = wrapper(async (req, res) => {
 });
 
 const getPostsByLikes = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const popularPosts = await Post.find({}).sort({ likes: "desc" }).limit(10);
     res.status(200);
     res.json(popularPosts);
 });
 
 const likePost = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
     //Did user like post or unlike
@@ -160,7 +153,6 @@ const likePost = wrapper(async (req, res) => {
 });
 
 const editPost = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = String(req.params.id);
     const dbPost = await Post.findOne({ _id: postId });
     if (!dbPost) {
@@ -221,7 +213,6 @@ const editPost = wrapper(async (req, res) => {
 });
 
 const deletePost = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const postId = String(req.params.id);
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {

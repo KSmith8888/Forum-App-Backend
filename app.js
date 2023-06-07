@@ -14,7 +14,7 @@ const limitErrorMsg = JSON.stringify({
 
 const limiter = rateLimit({
     windowMs: 60000,
-    max: 10,
+    max: 50,
     standardHeaders: true,
     legacyHeaders: false,
     message: limitErrorMsg,
@@ -36,7 +36,7 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("*", (req, res) => {
     res.status(404);
-    res.json({ message: "The requested resource does not exist" });
+    res.json({ msg: "The requested resource does not exist" });
 });
 
 export { app };
