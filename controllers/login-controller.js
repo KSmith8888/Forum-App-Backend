@@ -43,6 +43,7 @@ const attemptLogin = wrapper(async (req, res) => {
         role: dbUser.role,
         _id: dbUser._id,
         username: dbUser.username,
+        displayName: dbUser.displayName,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
         token,

@@ -6,7 +6,6 @@ import { Comment } from "../models/comment-model.js";
 import { wrapper } from "./wrapper.js";
 
 const createNewUser = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const displayName = req.body.username;
     const username = displayName.toLowerCase();
     const password = req.body.password;
@@ -18,6 +17,7 @@ const createNewUser = wrapper(async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
+    console.log(hashedPassword, req.ip);
     const userInfo = {
         username: username,
         password: hashedPassword,
@@ -31,8 +31,37 @@ const createNewUser = wrapper(async (req, res) => {
     });
 });
 
+const changeRoleToMod = wrapper(async (req, res) => {
+    const userRole = req.role;
+    const modUsername = req.body.modUsername;
+    if (userRole !== "admin") {
+        throw new Error(
+            "Role Error: Attempt to create mod without admin access"
+        );
+    }
+    if (!modUsername) {
+        throw new Error("User id of new mod not provided");
+    }
+    const dbMod = await User.findOne({ username: modUsername });
+    if (!dbMod) {
+        throw new Error("That user does not exist");
+    }
+    await User.findOneAndUpdate(
+        { username: modUsername },
+        {
+            $set: {
+                role: "mod",
+            },
+        }
+    );
+
+    res.status(201);
+    res.json({
+        status: "Mod role updated successfully",
+    });
+});
+
 const updateProfilePic = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const userId = req.userId;
     const newProfilePicName = req.body.name;
     const newProfilePicAlt = req.body.alt;
@@ -50,7 +79,6 @@ const updateProfilePic = wrapper(async (req, res) => {
 });
 
 const deleteOwnAccount = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const dbUser = await User.findOne({ _id: req.userId });
     const userPostIds = dbUser.posts.map((postObj) => {
         return postObj.id;
@@ -76,4 +104,4 @@ const deleteOwnAccount = wrapper(async (req, res) => {
     res.json({ msg: "Account deleted successfully" });
 });
 
-export { createNewUser, updateProfilePic, deleteOwnAccount };
+export { createNewUser, changeRoleToMod, updateProfilePic, deleteOwnAccount };

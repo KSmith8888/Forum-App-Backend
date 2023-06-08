@@ -3,6 +3,7 @@ import express from "express";
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import {
     createNewUser,
+    changeRoleToMod,
     updateProfilePic,
     deleteOwnAccount,
 } from "../controllers/users-controller.js";
@@ -13,6 +14,12 @@ const usersRouter = express.Router();
 
 usersRouter.options("*", optionsPreflight);
 usersRouter.post("/", sanitizeChars, createNewUser);
+usersRouter.patch(
+    "/profile/:id/role",
+    sanitizeChars,
+    authorizeUser,
+    changeRoleToMod
+);
 usersRouter.patch(
     "/profile/:id/image",
     sanitizeChars,
