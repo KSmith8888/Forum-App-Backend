@@ -17,7 +17,6 @@ const createNewUser = wrapper(async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(password, saltRounds);
-    console.log(hashedPassword, req.ip);
     const userInfo = {
         username: username,
         password: hashedPassword,
@@ -27,7 +26,7 @@ const createNewUser = wrapper(async (req, res) => {
 
     res.status(201);
     res.json({
-        status: "New account created successfully",
+        msg: "New account created successfully",
     });
 });
 
@@ -57,7 +56,7 @@ const changeRoleToMod = wrapper(async (req, res) => {
 
     res.status(201);
     res.json({
-        status: "Mod role updated successfully",
+        msg: "Mod role updated successfully",
     });
 });
 
@@ -75,11 +74,66 @@ const updateProfilePic = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ status: "Profile picture updated successfully" });
+    res.json({ msg: "Profile picture updated successfully" });
 });
 
 const deleteOwnAccount = wrapper(async (req, res) => {
     const dbUser = await User.findOne({ _id: req.userId });
+    const userPostIds = dbUser.posts.map((postObj) => {
+        return postObj.id;
+    });
+    if (userPostIds.length > 0) {
+        await Post.updateMany(
+            { _id: { $in: userPostIds } },
+            {
+                user: "Deleted",
+                content: "This post has been deleted",
+                keywords: [],
+                history: [],
+                hasBeenEdited: false,
+            }
+        );
+    }
+    const userCommentIds = dbUser.comments || [];
+    const userComments = await Comment.find({ _id: { $in: userCommentIds } });
+    const relatedPostIds = userComments.map((commentObj) => {
+        return commentObj.relatedPost;
+    });
+    const relatedPosts = await Post.find({ _id: { $in: relatedPostIds } });
+    for (const post of relatedPosts) {
+        const newRelatedComments = post.comments.filter((commentId) => {
+            return !userCommentIds.includes(commentId);
+        });
+        await Post.findOneAndUpdate(
+            { _id: post._id },
+            { comments: newRelatedComments }
+        );
+    }
+
+    if (userCommentIds.length > 0) {
+        await Comment.deleteMany({ _id: { $in: userCommentIds } });
+    }
+    await User.findByIdAndDelete({ _id: dbUser._id });
+    res.status(200);
+    res.json({ msg: "Account deleted successfully" });
+});
+
+const deleteUsersAccount = wrapper(async (req, res) => {
+    const role = req.role;
+    if (role !== "mod" && role !== "admin") {
+        throw new Error("You are not authorized to perform this action");
+    }
+    const username = req.params.username;
+    const dbUser = await User.findOne({ username: username });
+    if (!dbUser) {
+        throw new Error("No user found matching those credentials");
+    }
+    if (dbUser.role === "admin") {
+        throw new Error("Admin accounts cannot be deleted");
+    }
+    if (dbUser.role === "mod" && role !== "admin") {
+        throw new Error("Mod accounts can only be deleted by an admin");
+    }
     const userPostIds = dbUser.posts.map((postObj) => {
         return postObj.id;
     });
@@ -104,4 +158,10 @@ const deleteOwnAccount = wrapper(async (req, res) => {
     res.json({ msg: "Account deleted successfully" });
 });
 
-export { createNewUser, changeRoleToMod, updateProfilePic, deleteOwnAccount };
+export {
+    createNewUser,
+    changeRoleToMod,
+    updateProfilePic,
+    deleteOwnAccount,
+    deleteUsersAccount,
+};

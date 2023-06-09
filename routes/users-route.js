@@ -6,6 +6,7 @@ import {
     changeRoleToMod,
     updateProfilePic,
     deleteOwnAccount,
+    deleteUsersAccount,
 } from "../controllers/users-controller.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
 import { authorizeUser } from "../middleware/authorize.js";
@@ -15,7 +16,7 @@ const usersRouter = express.Router();
 usersRouter.options("*", optionsPreflight);
 usersRouter.post("/", sanitizeChars, createNewUser);
 usersRouter.patch(
-    "/profile/:id/role",
+    "/profile/:username/role",
     sanitizeChars,
     authorizeUser,
     changeRoleToMod
@@ -31,6 +32,12 @@ usersRouter.delete(
     sanitizeChars,
     authorizeUser,
     deleteOwnAccount
+);
+usersRouter.delete(
+    "/moderation/profile/:username",
+    sanitizeChars,
+    authorizeUser,
+    deleteUsersAccount
 );
 
 export { usersRouter };

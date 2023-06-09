@@ -32,7 +32,7 @@ const attemptLogin = wrapper(async (req, res) => {
         {
             id: dbUser._id,
             username: dbUser.username,
-            admin: dbUser.admin,
+            role: dbUser.role,
         },
         process.env.JWT_SECRET,
         { expiresIn: "2h" }

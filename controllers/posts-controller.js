@@ -214,11 +214,12 @@ const editPost = wrapper(async (req, res) => {
 
 const deletePost = wrapper(async (req, res) => {
     const postId = String(req.params.id);
+    const role = req.role;
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
         return String(postObj.id);
     });
-    if (!userPostIds.includes(postId)) {
+    if (!userPostIds.includes(postId) && role !== "mod" && role !== "admin") {
         throw new Error("Users can only edit their own posts");
     }
     const newUserPosts = dbUser.posts.filter((postObj) => {
