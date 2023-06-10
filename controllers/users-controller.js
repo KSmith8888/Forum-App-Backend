@@ -6,6 +6,19 @@ import { Comment } from "../models/comment-model.js";
 import { wrapper } from "./wrapper.js";
 
 const createNewUser = wrapper(async (req, res) => {
+    if (!req.body.username || !req.body.password) {
+        throw new Error(
+            "Bad Request Error: Username or password was not provided"
+        );
+    }
+    if (
+        typeof req.body.username !== "string" ||
+        typeof req.body.password !== "string"
+    ) {
+        throw new Error(
+            "Bad Request Error: Username or password was not provided"
+        );
+    }
     const displayName = req.body.username;
     const username = displayName.toLowerCase();
     const password = req.body.password;
@@ -41,7 +54,7 @@ const changeRoleToMod = wrapper(async (req, res) => {
     if (!modUsername) {
         throw new Error("User id of new mod not provided");
     }
-    const dbMod = await User.findOne({ username: modUsername });
+    const dbMod = await User.findOne({ username: String(modUsername) });
     if (!dbMod) {
         throw new Error("That user does not exist");
     }
@@ -64,12 +77,17 @@ const updateProfilePic = wrapper(async (req, res) => {
     const userId = req.userId;
     const newProfilePicName = req.body.name;
     const newProfilePicAlt = req.body.alt;
+    if (!newProfilePicName || !newProfilePicAlt) {
+        throw new Error(
+            "Bad Request Error: Picture name or alt was not provided"
+        );
+    }
     await User.findOneAndUpdate(
         { _id: userId },
         {
             $set: {
-                profileImageName: newProfilePicName,
-                profileImageAlt: newProfilePicAlt,
+                profileImageName: String(newProfilePicName),
+                profileImageAlt: String(newProfilePicAlt),
             },
         }
     );
@@ -79,6 +97,11 @@ const updateProfilePic = wrapper(async (req, res) => {
 
 const deleteOwnAccount = wrapper(async (req, res) => {
     const dbUser = await User.findOne({ _id: req.userId });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
     const userPostIds = dbUser.posts.map((postObj) => {
         return postObj.id;
     });
@@ -126,7 +149,9 @@ const deleteUsersAccount = wrapper(async (req, res) => {
     const username = req.params.username;
     const dbUser = await User.findOne({ username: username });
     if (!dbUser) {
-        throw new Error("No user found matching those credentials");
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
     }
     if (dbUser.role === "admin") {
         throw new Error("Admin accounts cannot be deleted");
@@ -150,6 +175,21 @@ const deleteUsersAccount = wrapper(async (req, res) => {
         );
     }
     const userCommentIds = dbUser.comments || [];
+    const userComments = await Comment.find({ _id: { $in: userCommentIds } });
+    const relatedPostIds = userComments.map((commentObj) => {
+        return commentObj.relatedPost;
+    });
+    const relatedPosts = await Post.find({ _id: { $in: relatedPostIds } });
+    for (const post of relatedPosts) {
+        const newRelatedComments = post.comments.filter((commentId) => {
+            return !userCommentIds.includes(commentId);
+        });
+        await Post.findOneAndUpdate(
+            { _id: post._id },
+            { comments: newRelatedComments }
+        );
+    }
+
     if (userCommentIds.length > 0) {
         await Comment.deleteMany({ _id: { $in: userCommentIds } });
     }

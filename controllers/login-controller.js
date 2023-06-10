@@ -11,6 +11,12 @@ const attemptLogin = wrapper(async (req, res) => {
     if (!attemptUsername || !attemptPassword) {
         throw new Error("Credential Error: Username or password not provided");
     }
+    if (
+        typeof attemptUsername !== "string" ||
+        typeof attemptPassword !== "string"
+    ) {
+        throw new Error("Bad Request Error: Invalid credential type provided");
+    }
     const dbUser = await User.findOne({
         username: attemptUsername.toLowerCase(),
     });

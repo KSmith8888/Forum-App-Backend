@@ -9,6 +9,20 @@ const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic;
     const title = req.body.title;
     const content = req.body.content;
+    if (!topic || !title || !content) {
+        throw new Error(
+            "Bad Request Error: Topic, title or content not provided"
+        );
+    }
+    if (
+        typeof topic !== "string" ||
+        typeof title !== "string" ||
+        typeof content !== "string"
+    ) {
+        throw new Error(
+            "Bad Request Error: Invalid type for topic, title or content provided"
+        );
+    }
     const displayName = req.username.toLowerCase();
     const initialKeywords = req.body.keywords
         ? req.body.keywords.split(" ")
@@ -153,7 +167,10 @@ const likePost = wrapper(async (req, res) => {
 });
 
 const editPost = wrapper(async (req, res) => {
-    const postId = String(req.params.id);
+    const postId = req.params.id;
+    if (typeof postId !== "string") {
+        throw new Error("Bad Request Error: Invalid type provided for post id");
+    }
     const dbPost = await Post.findOne({ _id: postId });
     if (!dbPost) {
         throw new Error("No post found matching that id");
@@ -177,7 +194,13 @@ const editPost = wrapper(async (req, res) => {
         content: prevPostContent,
         timestamp: prevTimestamp,
     };
+    if (req.body.title && typeof req.body.title !== "string") {
+        throw new Error("Bad Request Error: Invalid type provided for title");
+    }
     const newPostTitle = req.body.title || prevPostTitle;
+    if (typeof req.body.content !== "string") {
+        throw new Error("Bad Request Error: Invalid type provided for content");
+    }
     const newPostContent = req.body.content;
     if (!newPostContent) {
         throw new Error("No post content was provided");

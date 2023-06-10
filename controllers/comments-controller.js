@@ -6,11 +6,15 @@ import { Post } from "../models/post-model.js";
 import { User } from "../models/user-model.js";
 
 const createComment = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const content = req.body.content;
     const postId = req.body.postId;
     if (!content || !postId) {
         throw new Error("Bad Request Error: Content or post id not provided");
+    }
+    if (typeof content !== "string" || typeof postId !== "string") {
+        throw new Error(
+            "Bad Request Error: Invalid content or post id type provided"
+        );
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const dbComment = await Comment.create({
@@ -43,7 +47,6 @@ const createComment = wrapper(async (req, res) => {
 });
 
 const getComment = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const commentId = req.params.id;
     const requestedComment = await Comment.findOne({ _id: String(commentId) });
     if (!requestedComment) {
@@ -56,7 +59,6 @@ const getComment = wrapper(async (req, res) => {
 });
 
 const likeComment = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const commentId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
     //Did user like comment or unlike
@@ -115,8 +117,10 @@ const likeComment = wrapper(async (req, res) => {
 });
 
 const editComment = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
-    const commentId = String(req.params.id);
+    const commentId = req.params.id;
+    if (typeof commentId !== "string") {
+        throw new Error("Bad Request Error: Invalid comment id type provided");
+    }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userCommentIds = dbUser.comments.map((id) => {
         return String(id);
@@ -127,6 +131,9 @@ const editComment = wrapper(async (req, res) => {
     const newContent = req.body.content;
     if (!newContent) {
         throw new Error("Updated content not provided");
+    }
+    if (typeof newContent !== "string") {
+        throw new Error("Bad Request Error: Invalid content type provided");
     }
     const dbComment = await Comment.findOne({ _id: commentId });
     const prevContent = dbComment.content;
