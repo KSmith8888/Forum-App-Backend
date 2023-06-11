@@ -1,6 +1,6 @@
 function sanitizeChars(req, res, next) {
     try {
-        const reg = new RegExp("^[a-zA-Z0-9 .:,!-]+$", "m");
+        const reg = new RegExp("^[a-zA-Z0-9 .:,?'!-]+$", "m");
         if (
             (req.params.id && !reg.test(req.params.id)) ||
             (req.params.topic && !reg.test(req.params.topic)) ||

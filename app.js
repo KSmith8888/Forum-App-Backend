@@ -23,7 +23,19 @@ const limiter = rateLimit({
 const app = express();
 
 app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+    if (!req.headers.origin) {
+        res.status(400);
+        res.json({ msg: "Not authorized to access this resource" });
+    } else {
+        res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
+        res.header("X-Content-Type-Options", "nosniff");
+        res.header("X-Permitted-Cross-Domain-Policies", "none");
+        res.header(
+            "Strict-Transport-Security",
+            "max-age=31536000; includeSubDomains"
+        );
+        res.removeHeader("X-Powered-By");
+    }
     next();
 });
 
