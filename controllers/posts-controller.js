@@ -6,7 +6,7 @@ import { User } from "../models/user-model.js";
 import { Comment } from "../models/comment-model.js";
 
 const createPost = wrapper(async (req, res) => {
-    const topic = req.body.topic;
+    const topic = req.body.topic.toLowerCase();
     const title = req.body.title;
     const content = req.body.content;
     if (!topic || !title || !content) {
@@ -14,35 +14,31 @@ const createPost = wrapper(async (req, res) => {
             "Bad Request Error: Topic, title or content not provided"
         );
     }
-    if (
-        typeof topic !== "string" ||
-        typeof title !== "string" ||
-        typeof content !== "string"
-    ) {
-        throw new Error(
-            "Bad Request Error: Invalid type for topic, title or content provided"
-        );
-    }
     const displayName = req.username.toLowerCase();
     const initialKeywords = req.body.keywords
         ? req.body.keywords.split(" ")
         : [];
     const keywords = initialKeywords.map((keyword) => keyword.toLowerCase());
-    const allowedTopics = ["movies", "books", "games", "other"];
+    const allowedTopics = [
+        "programming",
+        "politics",
+        "space",
+        "movies",
+        "books",
+        "games",
+        "other",
+    ];
     if (!allowedTopics.includes(topic)) {
         throw new Error("Bad Request Error: Topic not allowed");
     }
     keywords.push(topic);
-    if (!title || !content) {
-        throw new Error("Bad Request Error: Title or content not provided");
-    }
     const dbUser = await User.findOne({ _id: req.userId });
     keywords.push(dbUser.username);
     const dbPost = await Post.create({
-        title: title,
-        content: content,
-        topic: topic,
-        user: displayName,
+        title: String(title),
+        content: String(content),
+        topic: String(topic),
+        user: String(displayName),
         keywords: keywords,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,

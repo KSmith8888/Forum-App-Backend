@@ -1,12 +1,12 @@
 function sanitizeChars(req, res, next) {
     try {
-        const reg = new RegExp("^[a-zA-Z0-9 .:,?'!-]+$", "m");
+        const reg = new RegExp("^[a-zA-Z0-9 .:,?_'!-]+$", "m");
         if (
             (req.params.id && !reg.test(req.params.id)) ||
             (req.params.topic && !reg.test(req.params.topic)) ||
             (req.params.query && !reg.test(req.params.query))
         ) {
-            throw new Error("Param text not valid");
+            throw new Error("Param text is not valid");
         }
         const bodyValues = Object.values(req.body);
         for (let value of bodyValues) {

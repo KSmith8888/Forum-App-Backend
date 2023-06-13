@@ -35,8 +35,8 @@ app.use((req, res, next) => {
             "max-age=31536000; includeSubDomains"
         );
         res.removeHeader("X-Powered-By");
+        next();
     }
-    next();
 });
 
 app.use(limiter);
