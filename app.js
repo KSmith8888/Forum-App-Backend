@@ -7,6 +7,7 @@ import { loginRouter } from "./routes/login-route.js";
 import { postsRouter } from "./routes/posts-route.js";
 import { usersRouter } from "./routes/users-route.js";
 import { commentsRouter } from "./routes/comments-route.js";
+import { moderationRouter } from "./routes/moderation-route.js";
 
 const limitErrorMsg = JSON.stringify({
     msg: "Too many requests, please try again later",
@@ -57,6 +58,7 @@ app.use("/api/v1/login", loginRouter);
 app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/comments", commentsRouter);
+app.use("/api/v1/moderation", moderationRouter);
 app.use("*", (req, res) => {
     res.status(404);
     res.json({ msg: "The requested resource does not exist" });
