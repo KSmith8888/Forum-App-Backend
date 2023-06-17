@@ -5,9 +5,15 @@ const reportSchema = new Schema(
     {
         messageId: {
             type: String,
+            required: true,
         },
         messageType: {
             type: String,
+            required: true,
+        },
+        reportedBy: {
+            type: String,
+            required: true,
         },
     },
     {
