@@ -15,6 +15,11 @@ const reportSchema = new Schema(
             type: String,
             required: true,
         },
+        relatedPost: {
+            type: String,
+            required: true,
+            default: "none",
+        },
     },
     {
         timestamps: true,

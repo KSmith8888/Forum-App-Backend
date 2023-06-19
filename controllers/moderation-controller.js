@@ -2,13 +2,16 @@ import { wrapper } from "./wrapper.js";
 import { Report } from "../models/report-modal.js";
 
 const reportMessage = wrapper(async (req, res) => {
-    if (!req.body.id || !req.body.type) {
-        throw new Error("Bad Request Error: Message id or type not provided");
+    if (!req.body.id || !req.body.type || !req.body.relatedPost) {
+        throw new Error(
+            "Bad Request Error: Reported message info not provided"
+        );
     }
     await Report.create({
         messageId: String(req.body.id),
         messageType: String(req.body.type),
         reportedBy: String(req.username),
+        relatedPost: String(req.body.relatedPost),
     });
     res.status(201);
     res.json({ msg: "Message reported successfully" });
