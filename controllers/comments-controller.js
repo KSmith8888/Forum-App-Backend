@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import { wrapper } from "./wrapper.js";
 import { Comment } from "../models/comment-model.js";
 import { Post } from "../models/post-model.js";
