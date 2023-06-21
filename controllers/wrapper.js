@@ -13,6 +13,11 @@ const wrapper = (fn) => {
                 res.json({
                     msg: "Provided credentials do not match",
                 });
+            } else if (err.message.startsWith("Not Authorized Error:")) {
+                res.status(403);
+                res.json({
+                    msg: "Not authorized to perform this action",
+                });
             } else if (err.message.startsWith("Not Found Error:")) {
                 res.status(404);
                 res.json({

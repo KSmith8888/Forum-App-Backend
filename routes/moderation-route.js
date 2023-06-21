@@ -3,6 +3,9 @@ import express from "express";
 import {
     reportMessage,
     getReportedMessages,
+    changeAccountRole,
+    deleteUsersPost,
+    deleteUsersAccount,
 } from "../controllers/moderation-controller.js";
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
@@ -18,5 +21,23 @@ moderationRouter.get(
     getReportedMessages
 );
 moderationRouter.post("/report", sanitizeChars, authorizeUser, reportMessage);
+moderationRouter.patch(
+    "/profile/:username/role",
+    sanitizeChars,
+    authorizeUser,
+    changeAccountRole
+);
+moderationRouter.delete(
+    "/posts/:id",
+    sanitizeChars,
+    authorizeUser,
+    deleteUsersPost
+);
+moderationRouter.delete(
+    "/profile/:username",
+    sanitizeChars,
+    authorizeUser,
+    deleteUsersAccount
+);
 
 export { moderationRouter };
