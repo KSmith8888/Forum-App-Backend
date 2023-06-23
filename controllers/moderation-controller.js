@@ -156,10 +156,27 @@ const deleteUsersAccount = wrapper(async (req, res) => {
     res.json({ msg: "Account deleted successfully" });
 });
 
+const deleteReport = wrapper(async (req, res) => {
+    const reportId = req.params.id;
+    if (!reportId) {
+        throw new Error("Bad Request Error: Report id not provided");
+    }
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.role !== "mod" && dbUser.role !== "admin") {
+        throw new Error(
+            "Not Authorized Error: User attempting to delete report"
+        );
+    }
+    await Report.findByIdAndDelete({ _id: String(reportId) });
+    res.status(200);
+    res.json({ msg: "Report deleted successfully" });
+});
+
 export {
     reportMessage,
     getReportedMessages,
     changeAccountRole,
     deleteUsersPost,
     deleteUsersAccount,
+    deleteReport,
 };

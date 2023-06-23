@@ -6,6 +6,7 @@ import {
     changeAccountRole,
     deleteUsersPost,
     deleteUsersAccount,
+    deleteReport,
 } from "../controllers/moderation-controller.js";
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
@@ -21,6 +22,12 @@ moderationRouter.get(
     getReportedMessages
 );
 moderationRouter.post("/report", sanitizeChars, authorizeUser, reportMessage);
+moderationRouter.delete(
+    "/report/:id",
+    sanitizeChars,
+    authorizeUser,
+    deleteReport
+);
 moderationRouter.patch(
     "/profile/:username/role",
     sanitizeChars,
