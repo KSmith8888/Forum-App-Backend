@@ -60,6 +60,7 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("/api/v1/moderation", moderationRouter);
 app.use("*", (req, res) => {
+    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     res.status(404);
     res.json({ msg: "The requested resource does not exist" });
 });
