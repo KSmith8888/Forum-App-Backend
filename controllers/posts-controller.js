@@ -167,7 +167,7 @@ const editPost = wrapper(async (req, res) => {
     if (typeof postId !== "string") {
         throw new Error("Bad Request Error: Invalid type provided for post id");
     }
-    const dbPost = await Post.findOne({ _id: postId });
+    const dbPost = await Post.findOne({ _id: String(postId) });
     if (!dbPost) {
         throw new Error("No post found matching that id");
     }
@@ -185,18 +185,14 @@ const editPost = wrapper(async (req, res) => {
         dbPost.createdAt !== dbPost.updatedAt
             ? dbPost.updatedAt
             : dbPost.createdAt;
+    const prevPostId = new mongoose.Types.ObjectId();
     const prevPostVersion = {
         title: prevPostTitle,
         content: prevPostContent,
         timestamp: prevTimestamp,
+        id: prevPostId,
     };
-    if (req.body.title && typeof req.body.title !== "string") {
-        throw new Error("Bad Request Error: Invalid type provided for title");
-    }
     const newPostTitle = req.body.title || prevPostTitle;
-    if (typeof req.body.content !== "string") {
-        throw new Error("Bad Request Error: Invalid type provided for content");
-    }
     const newPostContent = req.body.content;
     if (!newPostContent) {
         throw new Error("No post content was provided");
@@ -220,8 +216,8 @@ const editPost = wrapper(async (req, res) => {
         { _id: postId },
         {
             $set: {
-                title: newPostTitle,
-                content: newPostContent,
+                title: String(newPostTitle),
+                content: String(newPostContent),
                 hasBeenEdited: true,
                 history: [...prevPostHistory, prevPostVersion],
             },
