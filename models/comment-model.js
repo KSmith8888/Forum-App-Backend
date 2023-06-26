@@ -21,7 +21,7 @@ const commentSchema = new Schema(
             maxlength: 18,
             default: "User",
         },
-        relatedPost: {
+        relatedMessage: {
             type: String,
             required: true,
         },
@@ -44,6 +44,11 @@ const commentSchema = new Schema(
             type: String,
             required: true,
             default: "A generic blank avatar image of a mans head",
+        },
+        commentReply: {
+            type: Boolean,
+            required: true,
+            default: false,
         },
     },
     {

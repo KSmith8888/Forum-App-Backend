@@ -5,19 +5,17 @@ import { User } from "../models/user-model.js";
 
 const createComment = wrapper(async (req, res) => {
     const content = req.body.content;
-    const postId = req.body.postId;
-    if (!content || !postId) {
+    const relatedId = req.body.relatedId;
+    const replyType = req.body.replyType;
+    if (!content || !relatedId || !replyType) {
         throw new Error("Bad Request Error: Content or post id not provided");
     }
-    if (typeof content !== "string" || typeof postId !== "string") {
-        throw new Error(
-            "Bad Request Error: Invalid content or post id type provided"
-        );
-    }
     const dbUser = await User.findOne({ _id: String(req.userId) });
+    const isCommentReply = replyType === "comment" ? true : false;
     const dbComment = await Comment.create({
-        content: content,
-        relatedPost: postId,
+        content: String(content),
+        relatedMessage: String(relatedId),
+        commentReply: isCommentReply,
         user: dbUser.displayName,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
@@ -31,15 +29,30 @@ const createComment = wrapper(async (req, res) => {
             },
         }
     );
-    const dbPost = await Post.findOne({ _id: postId });
+    const dbMessage = await Post.findOne({ _id: String(relatedId) });
+    let newPostComments = [...dbMessage.comments, dbComment._id];
+    if (replyType === "comment") {
+        const commentIndex = dbMessage.comments.indexOf("commentId");
+        if (commentIndex === -1) {
+            throw new Error(
+                "Bad Request Error: No comment id passed for reply"
+            );
+        }
+        let newReplyComments = dbMessage.comments.slice(0, commentIndex + 1);
+        newReplyComments.push(dbComment._id);
+        let remainingComments = dbMessage.comments.splice(commentIndex + 1);
+        newReplyComments.push(remainingComments);
+        newPostComments = newReplyComments;
+    }
     await Post.findOneAndUpdate(
-        { _id: postId },
+        { _id: relatedId },
         {
             $set: {
-                comments: [...dbPost.comments, dbComment._id],
+                comments: newPostComments,
             },
         }
     );
+
     res.status(201);
     res.json(dbComment);
 });
