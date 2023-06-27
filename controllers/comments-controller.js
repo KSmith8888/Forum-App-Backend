@@ -5,16 +5,17 @@ import { User } from "../models/user-model.js";
 
 const createComment = wrapper(async (req, res) => {
     const content = req.body.content;
-    const relatedId = req.body.relatedId;
+    const postId = req.body.postId;
+    const commentId = req.body.commentId;
     const replyType = req.body.replyType;
-    if (!content || !relatedId || !replyType) {
+    if (!content || !postId || !replyType) {
         throw new Error("Bad Request Error: Content or post id not provided");
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const isCommentReply = replyType === "comment" ? true : false;
     const dbComment = await Comment.create({
         content: String(content),
-        relatedMessage: String(relatedId),
+        relatedMessage: String(postId),
         commentReply: isCommentReply,
         user: dbUser.displayName,
         profileImageName: dbUser.profileImageName,
@@ -29,10 +30,12 @@ const createComment = wrapper(async (req, res) => {
             },
         }
     );
-    const dbMessage = await Post.findOne({ _id: String(relatedId) });
+    const dbMessage = await Post.findOne({ _id: String(postId) });
+    //Message is a top level comment on the post and is placed at the end of the comments
     let newPostComments = [...dbMessage.comments, dbComment._id];
-    if (replyType === "comment") {
-        const commentIndex = dbMessage.comments.indexOf("commentId");
+    //Message is a nested reply to another comment and is placed just below the comment being replied to
+    if (isCommentReply && commentId !== "none") {
+        const commentIndex = dbMessage.comments.indexOf(commentId);
         if (commentIndex === -1) {
             throw new Error(
                 "Bad Request Error: No comment id passed for reply"
@@ -41,11 +44,11 @@ const createComment = wrapper(async (req, res) => {
         let newReplyComments = dbMessage.comments.slice(0, commentIndex + 1);
         newReplyComments.push(dbComment._id);
         let remainingComments = dbMessage.comments.splice(commentIndex + 1);
-        newReplyComments.push(remainingComments);
+        newReplyComments.push(...remainingComments);
         newPostComments = newReplyComments;
     }
     await Post.findOneAndUpdate(
-        { _id: relatedId },
+        { _id: postId },
         {
             $set: {
                 comments: newPostComments,
