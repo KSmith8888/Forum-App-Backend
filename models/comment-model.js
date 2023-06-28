@@ -21,7 +21,7 @@ const commentSchema = new Schema(
             maxlength: 18,
             default: "User",
         },
-        relatedMessage: {
+        relatedPost: {
             type: String,
             required: true,
         },

@@ -15,7 +15,7 @@ const createComment = wrapper(async (req, res) => {
     const isCommentReply = replyType === "comment" ? true : false;
     const dbComment = await Comment.create({
         content: String(content),
-        relatedMessage: String(postId),
+        relatedPost: String(postId),
         commentReply: isCommentReply,
         user: dbUser.displayName,
         profileImageName: dbUser.profileImageName,
@@ -47,8 +47,8 @@ const createComment = wrapper(async (req, res) => {
         newReplyComments.push(...remainingComments);
         newPostComments = newReplyComments;
     }
-    await Post.findOneAndUpdate(
-        { _id: postId },
+    const relatedPost = await Post.findOneAndUpdate(
+        { _id: String(postId) },
         {
             $set: {
                 comments: newPostComments,
@@ -57,7 +57,7 @@ const createComment = wrapper(async (req, res) => {
     );
 
     res.status(201);
-    res.json(dbComment);
+    res.json(relatedPost.comments);
 });
 
 const getComment = wrapper(async (req, res) => {
