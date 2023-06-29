@@ -50,6 +50,11 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
+    notifications: {
+        type: [Object],
+        required: true,
+        default: [],
+    },
     profileImageName: {
         type: String,
         required: true,

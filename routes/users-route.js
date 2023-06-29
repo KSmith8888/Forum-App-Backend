@@ -2,6 +2,7 @@ import express from "express";
 
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import {
+    getProfileInfo,
     createNewUser,
     updateProfilePic,
     deleteOwnAccount,
@@ -12,6 +13,12 @@ import { authorizeUser } from "../middleware/authorize.js";
 const usersRouter = express.Router();
 
 usersRouter.options("*", optionsPreflight);
+usersRouter.get(
+    "/profile/details/:id",
+    sanitizeChars,
+    authorizeUser,
+    getProfileInfo
+);
 usersRouter.post("/", sanitizeChars, createNewUser);
 usersRouter.patch(
     "/profile/:id/image",

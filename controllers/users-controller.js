@@ -1,9 +1,31 @@
 import bcrypt from "bcrypt";
+import mongoose from "mongoose";
 
 import { User } from "../models/user-model.js";
 import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { wrapper } from "./wrapper.js";
+
+const getProfileInfo = wrapper(async (req, res) => {
+    const userId = req.userId;
+    const dbUser = await User.findOne({ _id: String(userId) });
+    const commentObjectIds = dbUser.comments.map((id) => {
+        return new mongoose.Types.ObjectId(id);
+    });
+    const userComments = await Comment.find({
+        _id: {
+            $in: commentObjectIds,
+        },
+    });
+    const userPostData = dbUser.posts;
+    const userNotifications = dbUser.notifications;
+    res.status(200);
+    res.json({
+        posts: userPostData,
+        comments: userComments,
+        notifications: userNotifications,
+    });
+});
 
 const createNewUser = wrapper(async (req, res) => {
     if (!req.body.username || !req.body.password) {
@@ -111,4 +133,4 @@ const deleteOwnAccount = wrapper(async (req, res) => {
     res.json({ msg: "Account deleted successfully" });
 });
 
-export { createNewUser, updateProfilePic, deleteOwnAccount };
+export { getProfileInfo, createNewUser, updateProfilePic, deleteOwnAccount };

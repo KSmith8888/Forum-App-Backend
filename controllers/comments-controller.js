@@ -1,3 +1,5 @@
+import mongoose from "mongoose";
+
 import { wrapper } from "./wrapper.js";
 import { Comment } from "../models/comment-model.js";
 import { Post } from "../models/post-model.js";
@@ -55,6 +57,49 @@ const createComment = wrapper(async (req, res) => {
             },
         }
     );
+    const notificationId = new mongoose.Types.ObjectId();
+    const newNotification = {
+        _id: String(notificationId),
+        message: "Someone replied to your post",
+        isReply: true,
+        replyMessageId: String(postId),
+    };
+    if (!isCommentReply && req.username !== relatedPost.user.toLowerCase()) {
+        const replyUsername = relatedPost.user.toLowerCase();
+        const userToBeNotified = await User.findOne({
+            username: replyUsername,
+        });
+        await User.findOneAndUpdate(
+            { username: replyUsername },
+            {
+                $set: {
+                    notifications: [
+                        ...userToBeNotified.notifications,
+                        newNotification,
+                    ],
+                },
+            }
+        );
+    } else if (isCommentReply && commentId !== "none") {
+        const dbReplyComment = await Comment.findOne({
+            _id: String(commentId),
+        });
+        const replyCommentUsername = dbReplyComment.user.toLowerCase();
+        const userToBeNotified = await User.findOne({
+            username: replyCommentUsername,
+        });
+        await User.findOneAndUpdate(
+            { username: replyCommentUsername },
+            {
+                $set: {
+                    notifications: [
+                        ...userToBeNotified.notifications,
+                        newNotification,
+                    ],
+                },
+            }
+        );
+    }
 
     res.status(201);
     res.json(relatedPost.comments);
