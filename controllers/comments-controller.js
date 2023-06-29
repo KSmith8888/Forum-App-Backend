@@ -60,7 +60,7 @@ const createComment = wrapper(async (req, res) => {
     const notificationId = new mongoose.Types.ObjectId();
     const newNotification = {
         _id: String(notificationId),
-        message: "Someone replied to your post",
+        message: `${dbUser.displayName} replied to your message`,
         isReply: true,
         replyMessageId: String(postId),
     };

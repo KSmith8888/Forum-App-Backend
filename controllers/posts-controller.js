@@ -14,7 +14,6 @@ const createPost = wrapper(async (req, res) => {
             "Bad Request Error: Topic, title or content not provided"
         );
     }
-    const displayName = req.username.toLowerCase();
     const initialKeywords = req.body.keywords
         ? req.body.keywords.split(" ")
         : [];
@@ -38,7 +37,7 @@ const createPost = wrapper(async (req, res) => {
         title: String(title),
         content: String(content),
         topic: String(topic),
-        user: String(displayName),
+        user: dbUser.displayName,
         keywords: keywords,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
@@ -154,6 +153,32 @@ const likePost = wrapper(async (req, res) => {
             },
         }
     );
+    if (
+        didUserLike &&
+        (dbPost.likes === 5 || dbPost.likes === 10 || dbPost.likes === 25)
+    ) {
+        const postCreatorUsername = dbPost.user.toLowerCase();
+        const dbPostCreator = await User.findOne({
+            username: postCreatorUsername,
+        });
+        const notificationId = new mongoose.Types.ObjectId();
+        const newNotification = {
+            _id: String(notificationId),
+            message: `Your post, ${dbPost.title}, has ${dbPost.likes} likes`,
+            isReply: false,
+        };
+        await User.findOneAndUpdate(
+            { username: postCreatorUsername },
+            {
+                $set: {
+                    notifications: [
+                        ...dbPostCreator.notifications,
+                        newNotification,
+                    ],
+                },
+            }
+        );
+    }
     res.status(200);
     res.json({
         status: "Post liked successfully",
