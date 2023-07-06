@@ -28,9 +28,9 @@ const getProfileInfo = wrapper(async (req, res) => {
 });
 
 const createNewUser = wrapper(async (req, res) => {
-    if (!req.body.username || !req.body.password) {
+    if (!req.body.username || !req.body.password || !req.body.terms) {
         throw new Error(
-            "Bad Request Error: Username or password was not provided"
+            "Bad Request Error: Registration info was not provided"
         );
     }
     if (
