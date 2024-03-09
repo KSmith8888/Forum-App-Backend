@@ -17,6 +17,11 @@ const postSchema = new Schema(
             minlength: 4,
             maxlength: 900,
         },
+        postType: {
+            type: String,
+            required: true,
+            default: "Text",
+        },
         topic: {
             type: String,
             required: true,

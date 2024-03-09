@@ -9,10 +9,23 @@ const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic.toLowerCase();
     const title = req.body.title;
     const content = req.body.content;
-    if (!topic || !title || !content) {
+    const postType = req.body.postType;
+    if (
+        !topic ||
+        !title ||
+        !content ||
+        !postType ||
+        typeof content !== "string"
+    ) {
         throw new Error(
             "Bad Request Error: Topic, title or content not provided"
         );
+    }
+    if (postType !== "Text" && postType !== "Link") {
+        throw new Error("Bad Request Error: Post type is not valid");
+    }
+    if (postType === "Link" && !content.startsWith("https://")) {
+        throw new Error("Bad Request Error: Invalid link provided");
     }
     const initialKeywords = req.body.keywords
         ? req.body.keywords.split(" ")
@@ -35,6 +48,7 @@ const createPost = wrapper(async (req, res) => {
     keywords.push(dbUser.username);
     const dbPost = await Post.create({
         title: String(title),
+        postType: String(postType),
         content: String(content),
         topic: String(topic),
         user: dbUser.displayName,
