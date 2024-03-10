@@ -210,6 +210,13 @@ const editPost = wrapper(async (req, res) => {
     if (!dbPost) {
         throw new Error("No post found matching that id");
     }
+    const newPostContent = req.body.content;
+    if (!newPostContent) {
+        throw new Error("No post content was provided");
+    }
+    if (dbPost.postType === "Link" && !newPostContent.startsWith("https://")) {
+        throw new Error("Bad Request Error: Cannot change post type");
+    }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
         return String(postObj.id);
@@ -232,10 +239,6 @@ const editPost = wrapper(async (req, res) => {
         id: prevPostId,
     };
     const newPostTitle = req.body.title || prevPostTitle;
-    const newPostContent = req.body.content;
-    if (!newPostContent) {
-        throw new Error("No post content was provided");
-    }
     const newUserPosts = dbUser.posts.map((postObj) => {
         if (String(postObj.id) === postId) {
             return { title: newPostTitle, id: postId };
@@ -291,6 +294,7 @@ const deletePost = wrapper(async (req, res) => {
         {
             $set: {
                 user: "Deleted",
+                postType: "Text",
                 content: "This post has been deleted",
                 keywords: [],
                 history: [],
