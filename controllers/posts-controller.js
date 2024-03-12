@@ -24,8 +24,10 @@ const createPost = wrapper(async (req, res) => {
     if (postType !== "Text" && postType !== "Link") {
         throw new Error("Bad Request Error: Post type is not valid");
     }
-    if (postType === "Link" && !content.startsWith("https://")) {
-        throw new Error("Bad Request Error: Invalid link provided");
+    if (postType === "Link") {
+        if (!content.startsWith("https://") || content.includes(" ")) {
+            throw new Error("Bad Request Error: Invalid link provided");
+        }
     }
     const initialKeywords = req.body.keywords
         ? req.body.keywords.split(" ")
@@ -214,8 +216,13 @@ const editPost = wrapper(async (req, res) => {
     if (!newPostContent) {
         throw new Error("No post content was provided");
     }
-    if (dbPost.postType === "Link" && !newPostContent.startsWith("https://")) {
-        throw new Error("Bad Request Error: Cannot change post type");
+    if (dbPost.postType === "Link") {
+        if (
+            !newPostContent.startsWith("https://") ||
+            newPostContent.includes(" ")
+        ) {
+            throw new Error("Bad Request Error: Cannot change post type");
+        }
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
