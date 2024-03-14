@@ -3,7 +3,7 @@ import express from "express";
 import {
     createPost,
     getPost,
-    getPostsByLikes,
+    getHomePosts,
     getPostsByTopic,
     getPostsByUser,
     likePost,
@@ -20,7 +20,7 @@ const postsRouter = express.Router();
 postsRouter.options("*", optionsPreflight);
 postsRouter.post("/create", sanitizeChars, authorizeUser, createPost);
 postsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likePost);
-postsRouter.get("/popular", getPostsByLikes);
+postsRouter.get("/home", getHomePosts);
 postsRouter.get("/:topic", sanitizeChars, getPostsByTopic);
 postsRouter.get("/details/:id", sanitizeChars, getPost);
 postsRouter.get("/user/:id", sanitizeChars, getPostsByUser);

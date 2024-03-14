@@ -130,10 +130,11 @@ const getPostsByQuery = wrapper(async (req, res) => {
     res.json(results);
 });
 
-const getPostsByLikes = wrapper(async (req, res) => {
+const getHomePosts = wrapper(async (req, res) => {
     const popularPosts = await Post.find({}).sort({ likes: "desc" }).limit(10);
+    const newPosts = await Post.find({}).sort({ createdAt: "desc" }).limit(10);
     res.status(200);
-    res.json(popularPosts);
+    res.json({ popular: popularPosts, new: newPosts });
 });
 
 const likePost = wrapper(async (req, res) => {
@@ -306,6 +307,8 @@ const deletePost = wrapper(async (req, res) => {
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
+                profileImageName: "blank.png",
+                profileImageAlt: "A generic blank avatar image of a mans head",
             },
         }
     );
@@ -316,7 +319,7 @@ const deletePost = wrapper(async (req, res) => {
 export {
     createPost,
     getPost,
-    getPostsByLikes,
+    getHomePosts,
     getPostsByTopic,
     getPostsByUser,
     likePost,
