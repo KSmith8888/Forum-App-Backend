@@ -37,6 +37,7 @@ const createPost = wrapper(async (req, res) => {
         "programming",
         "politics",
         "space",
+        "news",
         "movies",
         "books",
         "games",
@@ -125,7 +126,7 @@ const getPostsByQuery = wrapper(async (req, res) => {
         throw new Error("User did not submit a valid query");
     }
     const query = req.params.query.toLowerCase();
-    const results = await Post.find({ keywords: query }).limit(20);
+    const results = await Post.find({ keywords: String(query) }).limit(20);
     res.status(200);
     res.json(results);
 });
