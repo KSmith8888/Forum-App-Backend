@@ -279,7 +279,7 @@ const editPost = wrapper(async (req, res) => {
 });
 
 const deletePost = wrapper(async (req, res) => {
-    const postId = String(req.params.id);
+    const postId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
         return String(postObj.id);
@@ -299,7 +299,7 @@ const deletePost = wrapper(async (req, res) => {
         }
     );
     await Post.findOneAndUpdate(
-        { _id: postId },
+        { _id: String(postId) },
         {
             $set: {
                 user: "Deleted",
@@ -314,7 +314,7 @@ const deletePost = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ message: "Post deleted successfully" });
+    res.json({ message: `Post ${postId} deleted successfully` });
 });
 
 export {

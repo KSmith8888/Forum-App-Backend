@@ -194,7 +194,7 @@ const editComment = wrapper(async (req, res) => {
     if (typeof newContent !== "string") {
         throw new Error("Bad Request Error: Invalid content type provided");
     }
-    const dbComment = await Comment.findOne({ _id: commentId });
+    const dbComment = await Comment.findOne({ _id: String(commentId) });
     const prevContent = dbComment.content;
     const prevTimestamp =
         dbComment.createdAt !== dbComment.updatedAt
@@ -217,9 +217,8 @@ const editComment = wrapper(async (req, res) => {
 });
 
 const deleteComment = wrapper(async (req, res) => {
-    res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const commentId = req.params.id;
-    const dbComment = await Comment.findOne({ _id: commentId });
+    const dbComment = await Comment.findOne({ _id: String(commentId) });
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userCommentIds = dbUser.comments.map((id) => {
         return String(id);
@@ -252,7 +251,7 @@ const deleteComment = wrapper(async (req, res) => {
     );
     await Comment.findByIdAndDelete({ _id: commentId });
     res.status(200);
-    res.json({ message: "Comment deleted successfully" });
+    res.json({ message: `Comment ${commentId} deleted successfully` });
 });
 
 export { createComment, getComment, likeComment, editComment, deleteComment };
