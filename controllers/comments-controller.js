@@ -224,7 +224,7 @@ const deleteComment = wrapper(async (req, res) => {
         return String(id);
     });
     if (!userCommentIds.includes(commentId)) {
-        throw new Error("Users can only edit their own comments");
+        throw new Error("Users can only delete their own comments");
     }
     const newUserComments = dbUser.comments.filter((id) => {
         return String(id) !== commentId;
@@ -237,6 +237,20 @@ const deleteComment = wrapper(async (req, res) => {
             },
         }
     );
+    await Comment.findOneAndUpdate(
+        { _id: String(commentId) },
+        {
+            $set: {
+                user: "Deleted",
+                content: "This comment has been deleted",
+                history: [],
+                hasBeenEdited: false,
+                profileImageName: "blank.png",
+                profileImageAlt: "A generic blank avatar image of a mans head",
+            },
+        }
+    );
+    /*
     const relatedPost = await Post.findOne({ _id: dbComment.relatedPost });
     const newPostComments = relatedPost.comments.filter((id) => {
         return id !== commentId;
@@ -250,6 +264,7 @@ const deleteComment = wrapper(async (req, res) => {
         }
     );
     await Comment.findByIdAndDelete({ _id: commentId });
+    */
     res.status(200);
     res.json({ message: `Comment ${commentId} deleted successfully` });
 });
