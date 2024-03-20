@@ -122,11 +122,27 @@ const getPostsByUser = wrapper(async (req, res) => {
 });
 
 const getPostsByQuery = wrapper(async (req, res) => {
-    if (!req.params.query) {
+    let query = req.params.query;
+    if (!query || typeof query !== "string") {
         throw new Error("User did not submit a valid query");
     }
-    const query = req.params.query.toLowerCase();
-    const results = await Post.find({ keywords: String(query) }).limit(20);
+    query = query.toLowerCase();
+    let results = [];
+    if (!query.includes(" ")) {
+        const singleResult = await Post.find({ keywords: String(query) }).limit(
+            20
+        );
+        results = singleResult;
+    } else {
+        const splitQuery = query.split(" ");
+        const firstResult = await Post.find({
+            keywords: String(splitQuery[0]),
+        }).limit(20);
+        const secondResult = await Post.find({
+            keywords: String(splitQuery[1]),
+        }).limit(20);
+        results = [...firstResult, ...secondResult];
+    }
     res.status(200);
     res.json(results);
 });

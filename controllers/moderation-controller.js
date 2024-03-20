@@ -88,15 +88,18 @@ const deleteUsersPost = wrapper(async (req, res) => {
         {
             $set: {
                 user: "Deleted",
+                postType: "Text",
                 content: "This post has been deleted",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
+                profileImageName: "blank.png",
+                profileImageAlt: "A generic blank avatar image of a mans head",
             },
         }
     );
     res.status(200);
-    res.json({ message: "Post deleted successfully" });
+    res.json({ msg: "Post deleted successfully" });
 });
 
 const deleteUsersAccount = wrapper(async (req, res) => {

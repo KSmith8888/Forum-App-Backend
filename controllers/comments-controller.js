@@ -250,21 +250,6 @@ const deleteComment = wrapper(async (req, res) => {
             },
         }
     );
-    /*
-    const relatedPost = await Post.findOne({ _id: dbComment.relatedPost });
-    const newPostComments = relatedPost.comments.filter((id) => {
-        return id !== commentId;
-    });
-    await Post.findOneAndUpdate(
-        { _id: relatedPost._id },
-        {
-            $set: {
-                comments: newPostComments,
-            },
-        }
-    );
-    await Comment.findByIdAndDelete({ _id: commentId });
-    */
     res.status(200);
     res.json({ message: `Comment ${commentId} deleted successfully` });
 });
