@@ -64,7 +64,10 @@ const createComment = wrapper(async (req, res) => {
         isReply: true,
         replyMessageId: String(postId),
     };
-    if (!isCommentReply && req.username !== relatedPost.user.toLowerCase()) {
+    if (
+        !isCommentReply &&
+        dbComment.user.toLowerCase() !== relatedPost.user.toLowerCase()
+    ) {
         const replyUsername = relatedPost.user.toLowerCase();
         const userToBeNotified = await User.findOne({
             username: replyUsername,
@@ -85,20 +88,22 @@ const createComment = wrapper(async (req, res) => {
             _id: String(commentId),
         });
         const replyCommentUsername = dbReplyComment.user.toLowerCase();
-        const userToBeNotified = await User.findOne({
-            username: replyCommentUsername,
-        });
-        await User.findOneAndUpdate(
-            { username: replyCommentUsername },
-            {
-                $set: {
-                    notifications: [
-                        ...userToBeNotified.notifications,
-                        newNotification,
-                    ],
-                },
-            }
-        );
+        if (replyCommentUsername !== dbComment.user.toLowerCase()) {
+            const userToBeNotified = await User.findOne({
+                username: replyCommentUsername,
+            });
+            await User.findOneAndUpdate(
+                { username: replyCommentUsername },
+                {
+                    $set: {
+                        notifications: [
+                            ...userToBeNotified.notifications,
+                            newNotification,
+                        ],
+                    },
+                }
+            );
+        }
     }
 
     res.status(201);
