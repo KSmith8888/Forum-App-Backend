@@ -88,7 +88,7 @@ const updateProfilePic = wrapper(async (req, res) => {
 });
 
 const deleteOwnAccount = wrapper(async (req, res) => {
-    const dbUser = await User.findOne({ _id: req.userId });
+    const dbUser = await User.findOne({ _id: String(req.userId) });
     if (!dbUser) {
         throw new Error(
             "Not Found Error: No user found matching those credentials"
@@ -102,10 +102,13 @@ const deleteOwnAccount = wrapper(async (req, res) => {
             { _id: { $in: userPostIds } },
             {
                 user: "Deleted",
+                postType: "Text",
                 content: "This post has been deleted",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
+                profileImageName: "blank.png",
+                profileImageAlt: "A generic blank avatar image of a mans head",
             }
         );
     }
@@ -126,11 +129,54 @@ const deleteOwnAccount = wrapper(async (req, res) => {
     }
 
     if (userCommentIds.length > 0) {
-        await Comment.deleteMany({ _id: { $in: userCommentIds } });
+        await Comment.updateMany(
+            { _id: { $in: userCommentIds } },
+            {
+                user: "Deleted",
+                content: "This comment has been deleted",
+                history: [],
+                hasBeenEdited: false,
+                profileImageName: "blank.png",
+                profileImageAlt: "A generic blank avatar image of a mans head",
+            }
+        );
     }
     await User.findByIdAndDelete({ _id: dbUser._id });
     res.status(200);
     res.json({ msg: "Account deleted successfully" });
 });
 
-export { getProfileInfo, createNewUser, updateProfilePic, deleteOwnAccount };
+const deleteNotification = wrapper(async (req, res) => {
+    const userId = req.userId;
+    const notificationId = req.params.id;
+    if (!userId || !notificationId) {
+        throw new Error("Must provide user ID and notification ID");
+    }
+    const dbUser = await User.findOne({ _id: String(userId) });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
+    const newNotifications = dbUser.notifications.filter(
+        (notification) => String(notification._id) !== notificationId
+    );
+    await User.findOneAndUpdate(
+        { _id: String(userId) },
+        {
+            $set: {
+                notifications: newNotifications,
+            },
+        }
+    );
+    res.status(200);
+    res.json({ msg: "Notification deleted successfully" });
+});
+
+export {
+    getProfileInfo,
+    createNewUser,
+    updateProfilePic,
+    deleteOwnAccount,
+    deleteNotification,
+};

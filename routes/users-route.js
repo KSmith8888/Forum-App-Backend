@@ -6,6 +6,7 @@ import {
     createNewUser,
     updateProfilePic,
     deleteOwnAccount,
+    deleteNotification,
 } from "../controllers/users-controller.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
 import { authorizeUser } from "../middleware/authorize.js";
@@ -31,6 +32,12 @@ usersRouter.delete(
     sanitizeChars,
     authorizeUser,
     deleteOwnAccount
+);
+usersRouter.delete(
+    "/profile/notifications/:id",
+    sanitizeChars,
+    authorizeUser,
+    deleteNotification
 );
 
 export { usersRouter };
