@@ -5,6 +5,7 @@ import {
     getReportedMessages,
     changeAccountRole,
     deleteUsersPost,
+    deleteUsersComment,
     deleteUsersAccount,
     deleteReport,
 } from "../controllers/moderation-controller.js";
@@ -39,6 +40,12 @@ moderationRouter.delete(
     sanitizeChars,
     authorizeUser,
     deleteUsersPost
+);
+moderationRouter.delete(
+    "/comments/:id",
+    sanitizeChars,
+    authorizeUser,
+    deleteUsersComment
 );
 moderationRouter.delete(
     "/profile/:username",

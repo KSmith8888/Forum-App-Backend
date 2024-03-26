@@ -66,7 +66,8 @@ const createComment = wrapper(async (req, res) => {
     };
     if (
         !isCommentReply &&
-        dbComment.user.toLowerCase() !== relatedPost.user.toLowerCase()
+        dbComment.user.toLowerCase() !== relatedPost.user.toLowerCase() &&
+        relatedPost.user !== "Deleted"
     ) {
         const replyUsername = relatedPost.user.toLowerCase();
         const userToBeNotified = await User.findOne({
@@ -88,7 +89,10 @@ const createComment = wrapper(async (req, res) => {
             _id: String(commentId),
         });
         const replyCommentUsername = dbReplyComment.user.toLowerCase();
-        if (replyCommentUsername !== dbComment.user.toLowerCase()) {
+        if (
+            replyCommentUsername !== "Deleted" &&
+            replyCommentUsername !== dbComment.user.toLowerCase()
+        ) {
             const userToBeNotified = await User.findOne({
                 username: replyCommentUsername,
             });

@@ -1,6 +1,7 @@
 import { wrapper } from "./wrapper.js";
-import { Report } from "../models/report-modal.js";
+import { Report } from "../models/report-model.js";
 import { Post } from "../models/post-model.js";
+import { Comment } from "../models/comment-model.js";
 import { User } from "../models/user-model.js";
 
 const reportMessage = wrapper(async (req, res) => {
@@ -72,11 +73,15 @@ const deleteUsersPost = wrapper(async (req, res) => {
             "Not Authorized Error: User attempting to mod delete post"
         );
     }
+    const dbPost = await Post.findOne({ _id: String(postId) });
+    const postCreatorUsername = dbPost.user.toLowerCase();
     const newUserPosts = dbUser.posts.filter((postObj) => {
         return String(postObj.id) !== String(postId);
     });
     await User.findOneAndUpdate(
-        { _id: String(req.userId) },
+        {
+            username: String(postCreatorUsername),
+        },
         {
             $set: {
                 posts: newUserPosts,
@@ -100,6 +105,49 @@ const deleteUsersPost = wrapper(async (req, res) => {
     );
     res.status(200);
     res.json({ msg: "Post deleted successfully" });
+});
+
+const deleteUsersComment = wrapper(async (req, res) => {
+    const commentId = req.params.id;
+    if (!commentId) {
+        throw new Error("Bad Request Error: Post id not provided");
+    }
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (req.role !== "mod" && req.role !== "admin") {
+        throw new Error(
+            "Not Authorized Error: User attempting to mod delete comment"
+        );
+    }
+    const dbComment = await Comment.findOne({ _id: String(commentId) });
+    const commentCreatorUsername = dbComment.user.toLowerCase();
+    const newUserComments = dbUser.comments.filter((id) => {
+        return String(id) !== commentId;
+    });
+    await User.findOneAndUpdate(
+        {
+            username: String(commentCreatorUsername),
+        },
+        {
+            $set: {
+                comments: newUserComments,
+            },
+        }
+    );
+    await Comment.findOneAndUpdate(
+        { _id: String(commentId) },
+        {
+            $set: {
+                user: "Deleted",
+                content: "This comment has been deleted",
+                history: [],
+                hasBeenEdited: false,
+                profileImageName: "blank.png",
+                profileImageAlt: "A generic blank avatar image of a mans head",
+            },
+        }
+    );
+    res.status(200);
+    res.json({ msg: "Comment deleted successfully" });
 });
 
 const deleteUsersAccount = wrapper(async (req, res) => {
@@ -180,6 +228,7 @@ export {
     getReportedMessages,
     changeAccountRole,
     deleteUsersPost,
+    deleteUsersComment,
     deleteUsersAccount,
     deleteReport,
 };
