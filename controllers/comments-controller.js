@@ -204,6 +204,9 @@ const editComment = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Invalid content type provided");
     }
     const dbComment = await Comment.findOne({ _id: String(commentId) });
+    if (dbComment.history.length > 5) {
+        throw new Error("Maximum number of edits reached");
+    }
     const prevContent = dbComment.content;
     const prevTimestamp =
         dbComment.createdAt !== dbComment.updatedAt

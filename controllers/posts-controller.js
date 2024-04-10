@@ -230,6 +230,9 @@ const editPost = wrapper(async (req, res) => {
     if (!dbPost) {
         throw new Error("No post found matching that id");
     }
+    if (dbPost.history.length > 5) {
+        throw new Error("Maximum number of edits reached");
+    }
     const newPostContent = req.body.content;
     if (!newPostContent) {
         throw new Error("No post content was provided");
