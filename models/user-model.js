@@ -45,6 +45,11 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
+    savedPosts: {
+        type: [Object],
+        required: true,
+        default: [],
+    },
     likedComments: {
         type: [String],
         required: true,

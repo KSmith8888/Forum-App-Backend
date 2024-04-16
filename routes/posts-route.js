@@ -7,6 +7,7 @@ import {
     getPostsByTopic,
     getPostsByUser,
     likePost,
+    savePost,
     getPostsByQuery,
     editPost,
     deletePost,
@@ -20,6 +21,7 @@ const postsRouter = express.Router();
 postsRouter.options("*", optionsPreflight);
 postsRouter.post("/create", sanitizeChars, authorizeUser, createPost);
 postsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likePost);
+postsRouter.patch("/save/:id", sanitizeChars, authorizeUser, savePost);
 postsRouter.get("/home", getHomePosts);
 postsRouter.get("/:topic", sanitizeChars, getPostsByTopic);
 postsRouter.get("/details/:id", sanitizeChars, getPost);

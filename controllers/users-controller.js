@@ -19,10 +19,12 @@ const getProfileInfo = wrapper(async (req, res) => {
     });
     const userPostData = dbUser.posts;
     const userNotifications = dbUser.notifications;
+    const userSavedPosts = dbUser.savedPosts;
     res.status(200);
     res.json({
         posts: userPostData,
         comments: userComments,
+        savedPosts: userSavedPosts,
         notifications: userNotifications,
     });
 });

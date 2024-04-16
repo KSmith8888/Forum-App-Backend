@@ -221,6 +221,38 @@ const likePost = wrapper(async (req, res) => {
     });
 });
 
+const savePost = wrapper(async (req, res) => {
+    const postId = req.params.id;
+    const postTitle = req.body.postTitle;
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    //Did user save post or unsave
+    let didUserSave = true;
+    let newSavedPosts = [];
+    dbUser.savedPosts.forEach((savedPost) => {
+        if (savedPost.id === postId) {
+            didUserSave = false;
+        } else {
+            newSavedPosts.push(savedPost);
+        }
+    });
+    if (didUserSave) {
+        newSavedPosts = [...newSavedPosts, { id: postId, title: postTitle }];
+    }
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                savedPosts: newSavedPosts,
+            },
+        }
+    );
+    res.status(200);
+    res.json({
+        message: "Post saved successfully",
+        didUserSave,
+    });
+});
+
 const editPost = wrapper(async (req, res) => {
     const postId = req.params.id;
     if (typeof postId !== "string") {
@@ -343,6 +375,7 @@ export {
     getPostsByTopic,
     getPostsByUser,
     likePost,
+    savePost,
     getPostsByQuery,
     editPost,
     deletePost,
