@@ -172,7 +172,9 @@ const deleteNotification = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ msg: "Notification deleted successfully" });
+    res.json({
+        message: `Notification ${notificationId} deleted successfully`,
+    });
 });
 
 export {
