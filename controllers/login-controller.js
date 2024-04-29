@@ -52,6 +52,9 @@ const attemptLogin = wrapper(async (req, res) => {
         displayName: dbUser.displayName,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
+        savedPosts: dbUser.savedPosts,
+        likedPosts: dbUser.likedPosts,
+        likedComments: dbUser.likedComments,
         token,
     });
 });
