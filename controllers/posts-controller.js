@@ -95,9 +95,10 @@ const getPost = wrapper(async (req, res) => {
 
 const getPostsByTopic = wrapper(async (req, res) => {
     const postsTopic = req.params.topic.toLowerCase();
-    const requestedPost = await Post.find({ topic: String(postsTopic) }).limit(
-        20
-    );
+    const requestedPost = await Post.find({
+        topic: String(postsTopic),
+        user: { $ne: "Deleted" },
+    }).limit(20);
     res.status(200);
     res.json(requestedPost);
 });
@@ -148,8 +149,12 @@ const getPostsByQuery = wrapper(async (req, res) => {
 });
 
 const getHomePosts = wrapper(async (req, res) => {
-    const popularPosts = await Post.find({}).sort({ likes: "desc" }).limit(10);
-    const newPosts = await Post.find({}).sort({ createdAt: "desc" }).limit(10);
+    const popularPosts = await Post.find({ user: { $ne: "Deleted" } })
+        .sort({ likes: "desc" })
+        .limit(10);
+    const newPosts = await Post.find({ user: { $ne: "Deleted" } })
+        .sort({ createdAt: "desc" })
+        .limit(10);
     res.status(200);
     res.json({ popular: popularPosts, new: newPosts });
 });
@@ -354,8 +359,8 @@ const deletePost = wrapper(async (req, res) => {
         {
             $set: {
                 user: "Deleted",
-                postType: "Text",
                 content: "This post has been deleted",
+                postType: "Text",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
