@@ -2,7 +2,8 @@ import express from "express";
 
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import {
-    getProfileInfo,
+    getOwnProfile,
+    getUserProfile,
     createNewUser,
     updateProfilePic,
     deleteOwnAccount,
@@ -14,11 +15,12 @@ import { authorizeUser } from "../middleware/authorize.js";
 const usersRouter = express.Router();
 
 usersRouter.options("*", optionsPreflight);
+usersRouter.get("/details/:username", sanitizeChars, getUserProfile);
 usersRouter.get(
     "/profile/details/:id",
     sanitizeChars,
     authorizeUser,
-    getProfileInfo
+    getOwnProfile
 );
 usersRouter.post("/", sanitizeChars, createNewUser);
 usersRouter.patch(

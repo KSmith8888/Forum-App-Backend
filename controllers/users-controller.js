@@ -6,7 +6,7 @@ import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { wrapper } from "./wrapper.js";
 
-const getProfileInfo = wrapper(async (req, res) => {
+const getOwnProfile = wrapper(async (req, res) => {
     const userId = req.userId;
     const dbUser = await User.findOne({ _id: String(userId) });
     const commentObjectIds = dbUser.comments.map((id) => {
@@ -26,6 +26,25 @@ const getProfileInfo = wrapper(async (req, res) => {
         comments: userComments,
         savedPosts: userSavedPosts,
         notifications: userNotifications,
+    });
+});
+
+const getUserProfile = wrapper(async (req, res) => {
+    const username = req.params.username.toLowerCase();
+    const dbUser = await User.findOne({ username: String(username) });
+    const commentObjectIds = dbUser.comments.map((id) => {
+        return new mongoose.Types.ObjectId(id);
+    });
+    const userComments = await Comment.find({
+        _id: {
+            $in: commentObjectIds,
+        },
+    });
+    const userPostData = dbUser.posts;
+    res.status(200);
+    res.json({
+        posts: userPostData,
+        comments: userComments,
     });
 });
 
@@ -178,7 +197,8 @@ const deleteNotification = wrapper(async (req, res) => {
 });
 
 export {
-    getProfileInfo,
+    getOwnProfile,
+    getUserProfile,
     createNewUser,
     updateProfilePic,
     deleteOwnAccount,
