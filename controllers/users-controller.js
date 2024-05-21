@@ -26,12 +26,16 @@ const getOwnProfile = wrapper(async (req, res) => {
         comments: userComments,
         savedPosts: userSavedPosts,
         notifications: userNotifications,
+        bio: dbUser.profileBio,
     });
 });
 
 const getUserProfile = wrapper(async (req, res) => {
     const username = req.params.username.toLowerCase();
     const dbUser = await User.findOne({ username: String(username) });
+    if (!dbUser) {
+        throw new Error("Not Found Error: No user found with that username");
+    }
     const commentObjectIds = dbUser.comments.map((id) => {
         return new mongoose.Types.ObjectId(id);
     });
@@ -43,8 +47,12 @@ const getUserProfile = wrapper(async (req, res) => {
     const userPostData = dbUser.posts;
     res.status(200);
     res.json({
+        username: dbUser.displayName,
         posts: userPostData,
         comments: userComments,
+        bio: dbUser.profileBio,
+        image: dbUser.profileImageName,
+        alt: dbUser.profileImageAlt,
     });
 });
 

@@ -60,6 +60,11 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
+    profileBio: {
+        type: String,
+        required: true,
+        default: "4em User",
+    },
     profileImageName: {
         type: String,
         required: true,
