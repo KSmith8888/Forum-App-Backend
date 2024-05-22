@@ -6,6 +6,7 @@ import {
     getUserProfile,
     createNewUser,
     updateProfilePic,
+    updateProfileBio,
     deleteOwnAccount,
     deleteNotification,
 } from "../controllers/users-controller.js";
@@ -28,6 +29,12 @@ usersRouter.patch(
     sanitizeChars,
     authorizeUser,
     updateProfilePic
+);
+usersRouter.patch(
+    "/profile/:id/bio",
+    sanitizeChars,
+    authorizeUser,
+    updateProfileBio
 );
 usersRouter.delete(
     "/profile/:id",

@@ -104,7 +104,7 @@ const updateProfilePic = wrapper(async (req, res) => {
         );
     }
     await User.findOneAndUpdate(
-        { _id: userId },
+        { _id: String(userId) },
         {
             $set: {
                 profileImageName: String(newProfilePicName),
@@ -114,6 +114,32 @@ const updateProfilePic = wrapper(async (req, res) => {
     );
     res.status(200);
     res.json({ msg: "Profile picture updated successfully" });
+});
+
+const updateProfileBio = wrapper(async (req, res) => {
+    const userId = req.userId;
+    const newBio = req.body.bioContent;
+    if (!userId) {
+        throw new Error("Must provide user ID");
+    }
+    const dbUser = await User.findOne({ _id: String(userId) });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
+    await User.findOneAndUpdate(
+        { _id: String(userId) },
+        {
+            $set: {
+                profileBio: newBio,
+            },
+        }
+    );
+    res.status(200);
+    res.json({
+        message: `Bio updated successfully`,
+    });
 });
 
 const deleteOwnAccount = wrapper(async (req, res) => {
@@ -209,6 +235,7 @@ export {
     getUserProfile,
     createNewUser,
     updateProfilePic,
+    updateProfileBio,
     deleteOwnAccount,
     deleteNotification,
 };
