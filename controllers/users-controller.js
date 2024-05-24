@@ -138,7 +138,7 @@ const updateProfileBio = wrapper(async (req, res) => {
     );
     res.status(200);
     res.json({
-        message: `Bio updated successfully`,
+        message: `Bio updated to: ${newBio}`,
     });
 });
 

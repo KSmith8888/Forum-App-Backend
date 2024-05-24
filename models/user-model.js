@@ -63,6 +63,8 @@ const userSchema = new Schema({
     profileBio: {
         type: String,
         required: true,
+        minlength: 4,
+        maxlength: 120,
         default: "4em User",
     },
     profileImageName: {
