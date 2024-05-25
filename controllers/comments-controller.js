@@ -63,6 +63,7 @@ const createComment = wrapper(async (req, res) => {
         message: `${dbUser.displayName} replied to your message`,
         isReply: true,
         replyMessageId: String(postId),
+        commentId: dbComment._id,
     };
     if (
         !isCommentReply &&
