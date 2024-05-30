@@ -64,10 +64,11 @@ const createNewUser = wrapper(async (req, res) => {
     }
     if (
         typeof req.body.username !== "string" ||
-        typeof req.body.password !== "string"
+        typeof req.body.password !== "string" ||
+        req.body.password.includes(" ")
     ) {
         throw new Error(
-            "Bad Request Error: Username or password was not provided"
+            "Bad Request Error: Username or password not in proper format"
         );
     }
     const displayName = req.body.username;
@@ -80,11 +81,11 @@ const createNewUser = wrapper(async (req, res) => {
         throw new Error("Username unavailable Error: Duplicate entry");
     }
     const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const hashedPassword = await bcrypt.hash(String(password), saltRounds);
     const userInfo = {
         username: username,
         password: hashedPassword,
-        displayName: displayName,
+        displayName: String(displayName),
     };
     await User.create(userInfo);
 
@@ -198,7 +199,7 @@ const deleteOwnAccount = wrapper(async (req, res) => {
     }
     await User.findByIdAndDelete({ _id: dbUser._id });
     res.status(200);
-    res.json({ msg: "Account deleted successfully" });
+    res.json({ message: "Account deleted successfully" });
 });
 
 const deleteNotification = wrapper(async (req, res) => {
