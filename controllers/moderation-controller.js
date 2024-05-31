@@ -1,8 +1,46 @@
+import mongoose from "mongoose";
+
 import { wrapper } from "./wrapper.js";
 import { Report } from "../models/report-model.js";
 import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { User } from "../models/user-model.js";
+
+const sendUserNotification = wrapper(async (req, res) => {
+    const role = req.role;
+    if (role !== "mod" && role !== "admin") {
+        throw new Error("You are not authorized to perform this action");
+    }
+    const username = req.params.username.toLowerCase();
+    const dbUser = await User.findOne({ username: username });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
+    const notificationMsg = req.body.notificationMsg;
+    if (!notificationMsg || typeof notificationMsg !== "string") {
+        throw new Error("Bad Request Error: Notification message not provided");
+    }
+    const notificationId = new mongoose.Types.ObjectId();
+    const newNotification = {
+        _id: String(notificationId),
+        message: notificationMsg,
+        isReply: false,
+        replyMessageId: "none",
+        commentId: "none",
+    };
+    await User.findOneAndUpdate(
+        { username: username },
+        {
+            $set: {
+                notifications: [...dbUser.notifications, newNotification],
+            },
+        }
+    );
+    res.status(200);
+    res.json({ msg: "Notification sent successfully" });
+});
 
 const reportMessage = wrapper(async (req, res) => {
     if (!req.body.id || !req.body.type || !req.body.relatedPost) {
@@ -155,7 +193,7 @@ const deleteUsersAccount = wrapper(async (req, res) => {
     if (role !== "mod" && role !== "admin") {
         throw new Error("You are not authorized to perform this action");
     }
-    const username = req.params.username;
+    const username = req.params.username.toLowerCase();
     const dbUser = await User.findOne({ username: username });
     if (!dbUser) {
         throw new Error(
@@ -224,6 +262,7 @@ const deleteReport = wrapper(async (req, res) => {
 });
 
 export {
+    sendUserNotification,
     reportMessage,
     getReportedMessages,
     changeAccountRole,

@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+    sendUserNotification,
     reportMessage,
     getReportedMessages,
     changeAccountRole,
@@ -23,6 +24,12 @@ moderationRouter.get(
     getReportedMessages
 );
 moderationRouter.post("/report", sanitizeChars, authorizeUser, reportMessage);
+moderationRouter.post(
+    "/notifications/:username",
+    sanitizeChars,
+    authorizeUser,
+    sendUserNotification
+);
 moderationRouter.delete(
     "/report/:id",
     sanitizeChars,

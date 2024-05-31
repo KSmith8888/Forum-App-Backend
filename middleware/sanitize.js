@@ -24,9 +24,17 @@ function sanitizeChars(req, res, next) {
                     if (!reg.test(str)) {
                         throw new Error("User input not valid: Array input");
                     }
+                    if (str.includes("data:")) {
+                        throw new Error("Value includes data url");
+                    }
                 });
-            } else if (typeof value === "string" && !reg.test(value)) {
-                throw new Error("User input not valid: String input");
+            } else if (typeof value === "string") {
+                if (!reg.test(value)) {
+                    throw new Error("User input not valid: String input");
+                }
+                if (value.includes("data:")) {
+                    throw new Error("Value includes data url");
+                }
             }
         }
         next();
