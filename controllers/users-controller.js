@@ -143,6 +143,43 @@ const updateProfileBio = wrapper(async (req, res) => {
     });
 });
 
+const updatePassword = wrapper(async (req, res) => {
+    const userId = req.userId;
+    const currentPassword = req.body.reqCurrentPass;
+    const newPassword = req.body.reqNewPass;
+    if (!userId) {
+        throw new Error("Must provide user ID");
+    }
+    const dbUser = await User.findOne({ _id: String(userId) });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
+    const hashedPassword = await bcrypt.compare(
+        currentPassword,
+        dbUser.password
+    );
+    if (!hashedPassword) {
+        throw new Error(
+            "Credential Error: Provided password does not match stored hash"
+        );
+    }
+    await User.findOneAndUpdate(
+        { _id: String(userId) },
+        {
+            $set: {
+                password: newPassword,
+            },
+        }
+    );
+    const currentDate = new Date();
+    res.status(200);
+    res.json({
+        message: `Password updated - ${currentDate}`,
+    });
+});
+
 const deleteOwnAccount = wrapper(async (req, res) => {
     const dbUser = await User.findOne({ _id: String(req.userId) });
     if (!dbUser) {
@@ -237,6 +274,7 @@ export {
     createNewUser,
     updateProfilePic,
     updateProfileBio,
+    updatePassword,
     deleteOwnAccount,
     deleteNotification,
 };
