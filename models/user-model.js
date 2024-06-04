@@ -30,6 +30,11 @@ const userSchema = new Schema({
         unique: true,
         trim: true,
     },
+    pswdLastUpdated: {
+        type: String,
+        required: true,
+        default: "Last updated at account creation",
+    },
     posts: {
         type: [Object],
         required: true,

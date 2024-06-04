@@ -27,6 +27,7 @@ const getOwnProfile = wrapper(async (req, res) => {
         savedPosts: userSavedPosts,
         notifications: userNotifications,
         bio: dbUser.profileBio,
+        pswdLastUpdated: dbUser.pswdLastUpdated,
     });
 });
 
@@ -82,10 +83,12 @@ const createNewUser = wrapper(async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
+    const currentDate = new Date().toDateString();
     const userInfo = {
         username: username,
         password: hashedPassword,
         displayName: String(displayName),
+        pswdLastUpdated: `Last updated - ${currentDate}`,
     };
     await User.create(userInfo);
 
@@ -165,15 +168,19 @@ const updatePassword = wrapper(async (req, res) => {
             "Credential Error: Provided password does not match stored hash"
         );
     }
+    const saltRounds = 10;
+    const newHash = await bcrypt.hash(String(newPassword), saltRounds);
+    const currentDate = new Date();
     await User.findOneAndUpdate(
         { _id: String(userId) },
         {
             $set: {
-                password: newPassword,
+                password: newHash,
+                pswdLastUpdated: `Last updated - ${currentDate.toDateString()}`,
             },
         }
     );
-    const currentDate = new Date();
+
     res.status(200);
     res.json({
         message: `Password updated - ${currentDate}`,
