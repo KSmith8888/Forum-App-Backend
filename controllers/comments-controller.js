@@ -61,7 +61,7 @@ const createComment = wrapper(async (req, res) => {
     const newNotification = {
         _id: String(notificationId),
         message: `${dbUser.displayName} replied to your message`,
-        isReply: true,
+        type: "Reply",
         replyMessageId: String(postId),
         commentId: dbComment._id,
     };

@@ -26,7 +26,7 @@ const sendUserNotification = wrapper(async (req, res) => {
     const newNotification = {
         _id: String(notificationId),
         message: notificationMsg,
-        isReply: false,
+        type: "Warning",
         replyMessageId: "none",
         commentId: "none",
     };
