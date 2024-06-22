@@ -19,6 +19,11 @@ const sendUserNotification = wrapper(async (req, res) => {
         );
     }
     const notificationMsg = req.body.notificationMsg;
+    const notificationType = req.body.isWarning ? "Warning" : "Notice";
+    let newNumOfWarnings = dbUser.numOfWarnings;
+    if (notificationType === "Warning") {
+        newNumOfWarnings += 1;
+    }
     if (!notificationMsg || typeof notificationMsg !== "string") {
         throw new Error("Bad Request Error: Notification message not provided");
     }
@@ -26,7 +31,7 @@ const sendUserNotification = wrapper(async (req, res) => {
     const newNotification = {
         _id: String(notificationId),
         message: notificationMsg,
-        type: "Warning",
+        type: notificationType,
         replyMessageId: "none",
         commentId: "none",
     };
@@ -35,6 +40,7 @@ const sendUserNotification = wrapper(async (req, res) => {
         {
             $set: {
                 notifications: [...dbUser.notifications, newNotification],
+                numOfWarnings: newNumOfWarnings,
             },
         }
     );
