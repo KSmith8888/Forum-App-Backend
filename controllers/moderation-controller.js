@@ -20,12 +20,12 @@ const sendUserNotification = wrapper(async (req, res) => {
     }
     const notificationMsg = req.body.notificationMsg;
     const notificationType = req.body.isWarning ? "Warning" : "Notice";
-    let newNumOfWarnings = dbUser.numOfWarnings;
-    if (notificationType === "Warning") {
-        newNumOfWarnings += 1;
-    }
     if (!notificationMsg || typeof notificationMsg !== "string") {
         throw new Error("Bad Request Error: Notification message not provided");
+    }
+    let newWarnings = dbUser.warnings;
+    if (notificationType === "Warning") {
+        newWarnings = [...newWarnings, notificationMsg];
     }
     const notificationId = new mongoose.Types.ObjectId();
     const newNotification = {
@@ -40,7 +40,7 @@ const sendUserNotification = wrapper(async (req, res) => {
         {
             $set: {
                 notifications: [...dbUser.notifications, newNotification],
-                numOfWarnings: newNumOfWarnings,
+                warnings: newWarnings,
             },
         }
     );
