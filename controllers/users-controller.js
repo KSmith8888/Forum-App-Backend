@@ -258,6 +258,15 @@ const deleteNotification = wrapper(async (req, res) => {
             "Not Found Error: No user found matching those credentials"
         );
     }
+    const matchingNotification = dbUser.notifications.find(
+        (note) => note._id === notificationId
+    );
+    if (!matchingNotification) {
+        throw new Error("No notification found matching that id");
+    }
+    if (matchingNotification.type === "Warning" && req.role !== "admin") {
+        throw new Error("You are not authorized to perform this action");
+    }
     const newNotifications = dbUser.notifications.filter(
         (notification) => String(notification._id) !== notificationId
     );

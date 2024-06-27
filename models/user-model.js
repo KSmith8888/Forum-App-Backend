@@ -35,11 +35,6 @@ const userSchema = new Schema({
         required: true,
         default: "Last updated at account creation",
     },
-    warnings: {
-        type: [String],
-        required: true,
-        default: [],
-    },
     posts: {
         type: [Object],
         required: true,

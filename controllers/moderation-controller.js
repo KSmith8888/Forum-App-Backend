@@ -6,6 +6,25 @@ import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { User } from "../models/user-model.js";
 
+const getUserWarnings = wrapper(async (req, res) => {
+    const role = req.role;
+    if (role !== "mod" && role !== "admin") {
+        throw new Error("You are not authorized to perform this action");
+    }
+    const username = req.params.username.toLowerCase();
+    const dbUser = await User.findOne({ username: username });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
+    const userWarnings = dbUser.notifications.filter(
+        (note) => note.type === "Warning"
+    );
+    res.status(200);
+    res.json({ msg: "Notification sent successfully", warnings: userWarnings });
+});
+
 const sendUserNotification = wrapper(async (req, res) => {
     const role = req.role;
     if (role !== "mod" && role !== "admin") {
@@ -23,10 +42,6 @@ const sendUserNotification = wrapper(async (req, res) => {
     if (!notificationMsg || typeof notificationMsg !== "string") {
         throw new Error("Bad Request Error: Notification message not provided");
     }
-    let newWarnings = dbUser.warnings;
-    if (notificationType === "Warning") {
-        newWarnings = [...newWarnings, notificationMsg];
-    }
     const notificationId = new mongoose.Types.ObjectId();
     const newNotification = {
         _id: String(notificationId),
@@ -40,7 +55,6 @@ const sendUserNotification = wrapper(async (req, res) => {
         {
             $set: {
                 notifications: [...dbUser.notifications, newNotification],
-                warnings: newWarnings,
             },
         }
     );
@@ -268,6 +282,7 @@ const deleteReport = wrapper(async (req, res) => {
 });
 
 export {
+    getUserWarnings,
     sendUserNotification,
     reportMessage,
     getReportedMessages,

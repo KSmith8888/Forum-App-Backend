@@ -1,6 +1,7 @@
 import express from "express";
 
 import {
+    getUserWarnings,
     sendUserNotification,
     reportMessage,
     getReportedMessages,
@@ -24,6 +25,12 @@ moderationRouter.get(
     getReportedMessages
 );
 moderationRouter.post("/report", sanitizeChars, authorizeUser, reportMessage);
+moderationRouter.get(
+    "/notifications/:username",
+    sanitizeChars,
+    authorizeUser,
+    getUserWarnings
+);
 moderationRouter.post(
     "/notifications/:username",
     sanitizeChars,
