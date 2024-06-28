@@ -280,7 +280,7 @@ const deleteNotification = wrapper(async (req, res) => {
     );
     res.status(200);
     res.json({
-        message: `Notification ${notificationId} deleted successfully`,
+        message: `Notification deleted successfully -Target ID-${notificationId}`,
     });
 });
 

@@ -370,7 +370,7 @@ const deletePost = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ message: `Post ${postId} deleted successfully` });
+    res.json({ message: `Post deleted successfully-Target ID-${postId}` });
 });
 
 export {

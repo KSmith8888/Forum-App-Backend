@@ -264,7 +264,9 @@ const deleteComment = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ message: `Comment ${commentId} deleted successfully` });
+    res.json({
+        message: `Comment deleted successfully-Target ID-${commentId}`,
+    });
 });
 
 export { createComment, getComment, likeComment, editComment, deleteComment };
