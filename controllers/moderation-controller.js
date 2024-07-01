@@ -235,8 +235,7 @@ const deleteUsersComment = wrapper(async (req, res) => {
 });
 
 const deleteUsersAccount = wrapper(async (req, res) => {
-    const role = req.role;
-    if (role !== "mod" && role !== "admin") {
+    if (req.role !== "admin") {
         throw new Error("You are not authorized to perform this action");
     }
     const username = req.params.username.toLowerCase();

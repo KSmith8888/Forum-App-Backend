@@ -13,6 +13,7 @@ import {
 } from "../controllers/users-controller.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
 import { authorizeUser } from "../middleware/authorize.js";
+import { checkIfBanned } from "../middleware/ban-status.js";
 
 const usersRouter = express.Router();
 
@@ -35,6 +36,7 @@ usersRouter.patch(
     "/profile/:id/bio",
     sanitizeChars,
     authorizeUser,
+    checkIfBanned,
     updateProfileBio
 );
 usersRouter.patch(
