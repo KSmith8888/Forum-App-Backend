@@ -3,6 +3,7 @@ import express from "express";
 import {
     getUserWarnings,
     sendUserNotification,
+    banUser,
     reportMessage,
     getReportedMessages,
     changeAccountRole,
@@ -37,6 +38,7 @@ moderationRouter.post(
     authorizeUser,
     sendUserNotification
 );
+moderationRouter.post("/ban/:username", sanitizeChars, authorizeUser, banUser);
 moderationRouter.delete(
     "/report/:id",
     sanitizeChars,

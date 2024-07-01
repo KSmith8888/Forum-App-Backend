@@ -62,6 +62,32 @@ const sendUserNotification = wrapper(async (req, res) => {
     res.json({ msg: "Notification sent successfully" });
 });
 
+const banUser = wrapper(async (req, res) => {
+    const bannedUser = req.body.banUser;
+    const banTimestamp = req.body.banTimestamp;
+    const username = req.params.username.toLowerCase();
+    const dbUser = await User.findOne({ username: username });
+    if (!dbUser) {
+        throw new Error(
+            "Not Found Error: No user found matching those credentials"
+        );
+    }
+    if (!bannedUser || !banTimestamp) {
+        throw new Error("Bad Request Error: Ban info not provided");
+    }
+    await User.findOneAndUpdate(
+        { username: username },
+        {
+            $set: {
+                isBanned: true,
+                endOfBan: banTimestamp,
+            },
+        }
+    );
+    res.status(201);
+    res.json({ msg: "User banned successfully" });
+});
+
 const reportMessage = wrapper(async (req, res) => {
     if (!req.body.id || !req.body.type || !req.body.relatedPost) {
         throw new Error(
@@ -284,6 +310,7 @@ const deleteReport = wrapper(async (req, res) => {
 export {
     getUserWarnings,
     sendUserNotification,
+    banUser,
     reportMessage,
     getReportedMessages,
     changeAccountRole,

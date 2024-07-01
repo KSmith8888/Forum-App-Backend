@@ -10,7 +10,11 @@ function sanitizeChars(req, res, next) {
         }
         const bodyValues = Object.values(req.body);
         for (let value of bodyValues) {
-            if (typeof value !== "string" && typeof value !== "object") {
+            if (
+                typeof value !== "string" &&
+                typeof value !== "object" &&
+                typeof value !== "number"
+            ) {
                 throw new Error("User input not valid: Not accepted type");
             }
             if (value === "") {

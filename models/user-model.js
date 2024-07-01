@@ -30,6 +30,16 @@ const userSchema = new Schema({
         unique: true,
         trim: true,
     },
+    isBanned: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
+    endOfBan: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
     pswdLastUpdated: {
         type: String,
         required: true,
