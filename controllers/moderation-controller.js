@@ -72,6 +72,9 @@ const banUser = wrapper(async (req, res) => {
             "Not Found Error: No user found matching those credentials"
         );
     }
+    if (dbUser.role === "admin") {
+        throw new Error("Bad Request Error: Not possible to ban an admin");
+    }
     if (!bannedUser || !banTimestamp) {
         throw new Error("Bad Request Error: Ban info not provided");
     }

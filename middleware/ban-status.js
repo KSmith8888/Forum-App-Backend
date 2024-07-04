@@ -16,9 +16,7 @@ async function checkIfBanned(req, res, next) {
                 throw new Error("Ban Type Error: Ban time is not type number");
             }
             if (banDiff > 0) {
-                throw new Error(
-                    `Ban Error: Account is banned until ${banEndDate}`
-                );
+                throw new Error(`Account is banned through - ${banEndDate}`);
             } else {
                 await User.findOneAndUpdate(
                     { _id: dbUser._id },
@@ -33,7 +31,7 @@ async function checkIfBanned(req, res, next) {
         }
         next();
     } catch (err) {
-        if (err.message.startsWith("Ban Error:")) {
+        if (err.message.startsWith("Account is banned")) {
             res.status(401);
             res.json({
                 msg: err.message,
