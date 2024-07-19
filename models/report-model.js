@@ -11,6 +11,10 @@ const reportSchema = new Schema(
             type: String,
             required: true,
         },
+        messageContent: {
+            type: String,
+            required: true,
+        },
         reportedBy: {
             type: String,
             required: true,
