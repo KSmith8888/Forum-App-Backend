@@ -100,8 +100,8 @@ const createNewUser = wrapper(async (req, res) => {
 
 const updateProfilePic = wrapper(async (req, res) => {
     const userId = req.userId;
-    const newProfilePicName = req.body.name;
-    const newProfilePicAlt = req.body.alt;
+    const newProfilePicName = req.body.pfpName;
+    const newProfilePicAlt = req.body.pfpAlt;
     if (!newProfilePicName || !newProfilePicAlt) {
         throw new Error(
             "Bad Request Error: Picture name or alt was not provided"
@@ -117,7 +117,11 @@ const updateProfilePic = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ msg: "Profile picture updated successfully" });
+    res.json({
+        message: "Profile picture updated successfully",
+        newProfilePicName,
+        newProfilePicAlt,
+    });
 });
 
 const updateProfileBio = wrapper(async (req, res) => {

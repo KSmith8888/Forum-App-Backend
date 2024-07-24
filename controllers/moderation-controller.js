@@ -22,7 +22,10 @@ const getUserWarnings = wrapper(async (req, res) => {
         (note) => note.type === "Warning"
     );
     res.status(200);
-    res.json({ msg: "Notification sent successfully", warnings: userWarnings });
+    res.json({
+        msg: "Warnings retrieved successfully",
+        warnings: userWarnings,
+    });
 });
 
 const sendUserNotification = wrapper(async (req, res) => {
