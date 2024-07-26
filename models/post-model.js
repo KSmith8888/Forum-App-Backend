@@ -54,6 +54,11 @@ const postSchema = new Schema(
             required: true,
             default: false,
         },
+        lastEditedAt: {
+            type: Date,
+            required: true,
+            default: new Date(),
+        },
         history: {
             type: [Object],
             required: true,

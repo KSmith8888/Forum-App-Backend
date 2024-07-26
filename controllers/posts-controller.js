@@ -328,6 +328,7 @@ const editPost = wrapper(async (req, res) => {
                 title: String(newPostTitle),
                 content: String(newPostContent),
                 hasBeenEdited: true,
+                lastEditedAt: new Date(),
                 history: [...prevPostHistory, prevPostVersion],
             },
         }
