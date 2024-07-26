@@ -180,8 +180,9 @@ const likeComment = wrapper(async (req, res) => {
     res.status(200);
     res.json({
         status: "Comment liked successfully",
-        likes: numberOfLikes,
-        didUserLike,
+        commentLikes: numberOfLikes,
+        didLikeComment: didUserLike,
+        likeCommentId: req.params.id,
     });
 });
 

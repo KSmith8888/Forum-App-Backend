@@ -223,6 +223,7 @@ const likePost = wrapper(async (req, res) => {
         status: "Post liked successfully",
         likes: numberOfLikes,
         didUserLike,
+        likePostId: req.params.id,
     });
 });
 
@@ -255,6 +256,7 @@ const savePost = wrapper(async (req, res) => {
     res.json({
         message: "Post saved successfully",
         didUserSave,
+        postId: req.params.id,
     });
 });
 
