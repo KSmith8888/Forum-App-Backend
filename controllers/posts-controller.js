@@ -295,8 +295,8 @@ const editPost = wrapper(async (req, res) => {
     const prevPostTitle = dbPost.title;
     const prevPostContent = dbPost.content;
     const prevTimestamp =
-        dbPost.createdAt !== dbPost.updatedAt
-            ? dbPost.updatedAt
+        dbPost.createdAt !== dbPost.lastEditedAt
+            ? dbPost.lastEditedAt
             : dbPost.createdAt;
     const prevPostId = new mongoose.Types.ObjectId();
     const prevPostVersion = {
@@ -322,7 +322,7 @@ const editPost = wrapper(async (req, res) => {
         }
     );
     await Post.findOneAndUpdate(
-        { _id: postId },
+        { _id: String(postId) },
         {
             $set: {
                 title: String(newPostTitle),
