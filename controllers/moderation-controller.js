@@ -23,7 +23,7 @@ const getUserWarnings = wrapper(async (req, res) => {
     );
     res.status(200);
     res.json({
-        msg: "Warnings retrieved successfully",
+        message: "Warnings retrieved successfully",
         warnings: userWarnings,
     });
 });
@@ -62,7 +62,7 @@ const sendUserNotification = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ msg: "Notification sent successfully" });
+    res.json({ message: "Notification sent successfully" });
 });
 
 const banUser = wrapper(async (req, res) => {
@@ -91,7 +91,7 @@ const banUser = wrapper(async (req, res) => {
         }
     );
     res.status(201);
-    res.json({ msg: "User banned successfully" });
+    res.json({ message: "User banned successfully" });
 });
 
 const reportMessage = wrapper(async (req, res) => {
@@ -113,7 +113,7 @@ const reportMessage = wrapper(async (req, res) => {
         relatedPost: String(req.body.reportRelated),
     });
     res.status(201);
-    res.json({ msg: "Message reported successfully" });
+    res.json({ message: "Message reported successfully" });
 });
 
 const getReportedMessages = wrapper(async (req, res) => {
@@ -154,7 +154,7 @@ const changeAccountRole = wrapper(async (req, res) => {
     );
     res.status(200);
     res.json({
-        msg: "Account role updated successfully",
+        message: "Account role updated successfully",
     });
 });
 
@@ -200,7 +200,7 @@ const deleteUsersPost = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ msg: "Post deleted successfully" });
+    res.json({ message: "Post deleted successfully" });
 });
 
 const deleteUsersComment = wrapper(async (req, res) => {
@@ -243,7 +243,7 @@ const deleteUsersComment = wrapper(async (req, res) => {
         }
     );
     res.status(200);
-    res.json({ msg: "Comment deleted successfully" });
+    res.json({ message: "Comment deleted successfully" });
 });
 
 const deleteUsersAccount = wrapper(async (req, res) => {
@@ -299,7 +299,7 @@ const deleteUsersAccount = wrapper(async (req, res) => {
     }
     await User.findByIdAndDelete({ _id: dbUser._id });
     res.status(200);
-    res.json({ msg: "Account deleted successfully" });
+    res.json({ message: "Account deleted successfully" });
 });
 
 const deleteReport = wrapper(async (req, res) => {
@@ -315,7 +315,7 @@ const deleteReport = wrapper(async (req, res) => {
     }
     await Report.findByIdAndDelete({ _id: String(reportId) });
     res.status(200);
-    res.json({ msg: "Report deleted successfully" });
+    res.json({ message: "Report deleted successfully" });
 });
 
 export {

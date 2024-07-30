@@ -34,12 +34,12 @@ async function checkIfBanned(req, res, next) {
         if (err.message.startsWith("Account is banned")) {
             res.status(401);
             res.json({
-                msg: err.message,
+                message: err.message,
             });
         } else {
             res.status(500);
             res.json({
-                msg: "There has been an error, please try again later",
+                message: "There has been an error, please try again later",
             });
         }
     }

@@ -94,7 +94,7 @@ const createNewUser = wrapper(async (req, res) => {
 
     res.status(201);
     res.json({
-        msg: "New account created successfully",
+        message: "New account created successfully",
     });
 });
 

@@ -11,32 +11,34 @@ const wrapper = (fn) => {
             if (err.message.startsWith("Credential Error:")) {
                 res.status(401);
                 res.json({
-                    msg: "Provided credentials do not match",
+                    message: "Provided credentials do not match",
                 });
             } else if (err.message.startsWith("Not Authorized Error:")) {
                 res.status(403);
                 res.json({
-                    msg: "Not authorized to perform this action",
+                    message: "Not authorized to perform this action",
                 });
             } else if (err.message.startsWith("Not Found Error:")) {
                 res.status(404);
                 res.json({
-                    msg: "Requested data not found",
+                    message: "Requested data not found",
                 });
             } else if (err.message.startsWith("Bad Request Error:")) {
                 res.status(400);
                 res.json({
-                    msg: "Please provide all of the requested information in the correct format",
+                    message:
+                        "Please provide all of the requested information in the correct format",
                 });
             } else if (err.message.startsWith("Username unavailable Error:")) {
                 res.status(400);
                 res.json({
-                    msg: "Sorry, that username is not available. Please choose a different username",
+                    message:
+                        "Sorry, that username is not available. Please choose a different username",
                 });
             } else {
                 res.status(500);
                 res.json({
-                    msg: "There has been an error, please try again later",
+                    message: "There has been an error, please try again later",
                 });
             }
         }

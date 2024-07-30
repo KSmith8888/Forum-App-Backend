@@ -46,7 +46,7 @@ function sanitizeChars(req, res, next) {
         console.error(err.message);
         res.status(400);
         res.json({
-            msg: "Please do not include special characters in your request",
+            message: "Please do not include special characters in your request",
         });
     }
 }

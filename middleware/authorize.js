@@ -37,22 +37,23 @@ async function authorizeUser(req, res, next) {
         if (err.message.startsWith("Authorization Error:")) {
             res.status(401);
             res.json({
-                msg: "You must log in before performing that action",
+                message: "You must log in before performing that action",
             });
         } else if (err.message === "jwt expired") {
             res.status(401);
             res.json({
-                msg: "You have been automatically logged out, please log back in to access this resource",
+                message:
+                    "You have been automatically logged out, please log back in to access this resource",
             });
         } else if (err.message.startsWith("Credential Error:")) {
             res.status(400);
             res.json({
-                msg: "Provided credentials do not match",
+                message: "Provided credentials do not match",
             });
         } else {
             res.status(500);
             res.json({
-                msg: "There has been an error, please try again later",
+                message: "There has been an error, please try again later",
             });
         }
     }

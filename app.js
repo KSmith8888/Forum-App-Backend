@@ -10,7 +10,7 @@ import { commentsRouter } from "./routes/comments-route.js";
 import { moderationRouter } from "./routes/moderation-route.js";
 
 const limitErrorMsg = JSON.stringify({
-    msg: "Too many requests, please try again later",
+    message: "Too many requests, please try again later",
 });
 
 const limiter = rateLimit({
@@ -48,7 +48,7 @@ app.use((req, res, next) => {
         console.log(error.message);
         res.status(500);
         res.json({
-            msg: "There has been an error, please try again later",
+            message: "There has been an error, please try again later",
         });
     }
 });
@@ -64,7 +64,7 @@ app.use("/api/v1/moderation", moderationRouter);
 app.use("*", (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     res.status(404);
-    res.json({ msg: "The requested resource does not exist" });
+    res.json({ message: "The requested resource does not exist" });
 });
 
 export { app };

@@ -8,7 +8,7 @@ const optionsPreflight = wrapper(async (req, res) => {
         "content-type,authorization,user_id"
     );
     res.status(200);
-    res.json({ msg: "Preflight Passed" });
+    res.json({ message: "Preflight Passed" });
 });
 
 export { optionsPreflight };
