@@ -217,21 +217,6 @@ const deleteOwnAccount = wrapper(async (req, res) => {
         );
     }
     const userCommentIds = dbUser.comments || [];
-    const userComments = await Comment.find({ _id: { $in: userCommentIds } });
-    const relatedPostIds = userComments.map((commentObj) => {
-        return commentObj.relatedPost;
-    });
-    const relatedPosts = await Post.find({ _id: { $in: relatedPostIds } });
-    for (const post of relatedPosts) {
-        const newRelatedComments = post.comments.filter((commentId) => {
-            return !userCommentIds.includes(commentId);
-        });
-        await Post.findOneAndUpdate(
-            { _id: post._id },
-            { comments: newRelatedComments }
-        );
-    }
-
     if (userCommentIds.length > 0) {
         await Comment.updateMany(
             { _id: { $in: userCommentIds } },
