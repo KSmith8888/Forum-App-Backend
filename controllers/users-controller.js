@@ -144,9 +144,11 @@ const updateProfileBio = wrapper(async (req, res) => {
             },
         }
     );
+    const currentDate = new Date();
     res.status(200);
     res.json({
-        message: `Bio updated to: ${newBio}`,
+        message: "Bio updated successfully",
+        bioUpdatedAt: currentDate.toDateString(),
     });
 });
 

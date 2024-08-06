@@ -215,13 +215,17 @@ const deleteUsersComment = wrapper(async (req, res) => {
         );
     }
     const dbComment = await Comment.findOne({ _id: String(commentId) });
-    const commentCreatorUsername = dbComment.user.toLowerCase();
-    const newUserComments = dbUser.comments.filter((id) => {
+    const commentCreatorName = dbComment.user.toLowerCase();
+    const commentCreator = User.find({ username: commentCreatorName });
+    if (!commentCreator) {
+        throw new Error("Not Found Error: No user with that username found");
+    }
+    const newUserComments = commentCreator.comments.filter((id) => {
         return String(id) !== commentId;
     });
     await User.findOneAndUpdate(
         {
-            username: String(commentCreatorUsername),
+            username: String(commentCreatorName),
         },
         {
             $set: {
