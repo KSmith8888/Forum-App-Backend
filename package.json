@@ -4,7 +4,6 @@
     "description": "The backend of a forum/social media app made with the MERN stack",
     "main": "index.js",
     "type": "module",
-    "license": "MIT",
     "private": "true",
     "engines": {
         "node": ">=20.11.1"
@@ -27,9 +26,9 @@
         "bcrypt": "^5.1.1",
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
-        "express-rate-limit": "^7.3.1",
+        "express-rate-limit": "^7.4.0",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^8.4.3"
+        "mongoose": "^8.5.2"
     },
     "devDependencies": {
         "eslint": "^8.57.0",
