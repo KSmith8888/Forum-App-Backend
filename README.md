@@ -22,7 +22,3 @@ eslint:
 https://github.com/eslint/eslint  
 nodemon:  
 https://github.com/remy/nodemon
-
-## License
-
-MIT: https://github.com/KSmith8888/Forum-App-Backend/blob/main/LICENSE
