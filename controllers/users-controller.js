@@ -72,8 +72,12 @@ const createNewUser = wrapper(async (req, res) => {
             "Bad Request Error: Username or password not in proper format"
         );
     }
+    const bannedNames = ["deleted", "admin", "mod"];
     const displayName = req.body.username;
     const username = displayName.toLowerCase();
+    if (bannedNames.includes(username)) {
+        throw new Error("Bad Request Error: Banned username attempt");
+    }
     const password = req.body.password;
     const requestedUsername = await User.findOne({
         username: username,
