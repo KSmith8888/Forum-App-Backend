@@ -75,6 +75,11 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
+    getReplyNotifications: {
+        type: Boolean,
+        required: true,
+        default: true,
+    },
     profileBio: {
         type: String,
         required: true,

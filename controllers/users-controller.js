@@ -28,6 +28,7 @@ const getOwnProfile = wrapper(async (req, res) => {
         notifications: userNotifications,
         bio: dbUser.profileBio,
         pswdLastUpdated: dbUser.pswdLastUpdated,
+        replySetting: dbUser.getReplyNotifications,
     });
 });
 
@@ -54,6 +55,7 @@ const getUserProfile = wrapper(async (req, res) => {
         bio: dbUser.profileBio,
         image: dbUser.profileImageName,
         alt: dbUser.profileImageAlt,
+        replySetting: dbUser.getReplyNotifications,
     });
 });
 
@@ -131,14 +133,8 @@ const updateProfilePic = wrapper(async (req, res) => {
 const updateProfileBio = wrapper(async (req, res) => {
     const userId = req.userId;
     const newBio = req.body.bioContent;
-    if (!userId) {
-        throw new Error("Must provide user ID");
-    }
-    const dbUser = await User.findOne({ _id: String(userId) });
-    if (!dbUser) {
-        throw new Error(
-            "Not Found Error: No user found matching those credentials"
-        );
+    if (!newBio) {
+        throw new Error("Must provide new bio content");
     }
     await User.findOneAndUpdate(
         { _id: String(userId) },
@@ -160,15 +156,10 @@ const updatePassword = wrapper(async (req, res) => {
     const userId = req.userId;
     const currentPassword = req.body.reqCurrentPass;
     const newPassword = req.body.reqNewPass;
-    if (!userId) {
-        throw new Error("Must provide user ID");
+    if (!currentPassword || newPassword) {
+        throw new Error("Must provide current password and new password");
     }
     const dbUser = await User.findOne({ _id: String(userId) });
-    if (!dbUser) {
-        throw new Error(
-            "Not Found Error: No user found matching those credentials"
-        );
-    }
     const hashedPassword = await bcrypt.compare(
         currentPassword,
         dbUser.password
@@ -197,13 +188,27 @@ const updatePassword = wrapper(async (req, res) => {
     });
 });
 
+const updateNotificationSetting = wrapper(async (req, res) => {
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    const newSetting = !dbUser.getReplyNotifications;
+    await User.findOneAndUpdate(
+        { _id: String(req.userId) },
+        {
+            $set: {
+                getReplyNotifications: newSetting,
+            },
+        }
+    );
+    const isSettingOn = newSetting ? "On" : "Off";
+    res.status(200);
+    res.json({
+        replySetting: newSetting,
+        message: `Reply notifications are now turned ${isSettingOn}`,
+    });
+});
+
 const deleteOwnAccount = wrapper(async (req, res) => {
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    if (!dbUser) {
-        throw new Error(
-            "Not Found Error: No user found matching those credentials"
-        );
-    }
     const userPostIds = dbUser.posts.map((postObj) => {
         return postObj.id;
     });
@@ -248,11 +253,6 @@ const deleteNotification = wrapper(async (req, res) => {
         throw new Error("Must provide user ID and notification ID");
     }
     const dbUser = await User.findOne({ _id: String(userId) });
-    if (!dbUser) {
-        throw new Error(
-            "Not Found Error: No user found matching those credentials"
-        );
-    }
     const matchingNotification = dbUser.notifications.find(
         (note) => note._id === notificationId
     );
@@ -286,6 +286,7 @@ export {
     updateProfilePic,
     updateProfileBio,
     updatePassword,
+    updateNotificationSetting,
     deleteOwnAccount,
     deleteNotification,
 };

@@ -65,38 +65,40 @@ const createComment = wrapper(async (req, res) => {
         replyMessageId: String(postId),
         commentId: dbComment._id,
     };
-    if (
-        !isCommentReply &&
-        dbComment.user.toLowerCase() !== relatedPost.user.toLowerCase() &&
-        relatedPost.user !== "Deleted"
-    ) {
+    if (!isCommentReply && relatedPost.user !== "Deleted") {
         const replyUsername = relatedPost.user.toLowerCase();
         const userToBeNotified = await User.findOne({
             username: replyUsername,
         });
-        await User.findOneAndUpdate(
-            { username: replyUsername },
-            {
-                $set: {
-                    notifications: [
-                        ...userToBeNotified.notifications,
-                        newNotification,
-                    ],
-                },
-            }
-        );
+        if (
+            dbComment.user.toLowerCase() !== relatedPost.user.toLowerCase() &&
+            userToBeNotified.getReplyNotifications
+        ) {
+            await User.findOneAndUpdate(
+                { username: replyUsername },
+                {
+                    $set: {
+                        notifications: [
+                            ...userToBeNotified.notifications,
+                            newNotification,
+                        ],
+                    },
+                }
+            );
+        }
     } else if (isCommentReply && commentId !== "none") {
         const dbReplyComment = await Comment.findOne({
             _id: String(commentId),
         });
         const replyCommentUsername = dbReplyComment.user.toLowerCase();
+        const userToBeNotified = await User.findOne({
+            username: replyCommentUsername,
+        });
         if (
             replyCommentUsername !== "Deleted" &&
-            replyCommentUsername !== dbComment.user.toLowerCase()
+            replyCommentUsername !== dbComment.user.toLowerCase() &&
+            userToBeNotified.getReplyNotifications
         ) {
-            const userToBeNotified = await User.findOne({
-                username: replyCommentUsername,
-            });
             await User.findOneAndUpdate(
                 { username: replyCommentUsername },
                 {

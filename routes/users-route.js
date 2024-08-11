@@ -8,6 +8,7 @@ import {
     updateProfilePic,
     updateProfileBio,
     updatePassword,
+    updateNotificationSetting,
     deleteOwnAccount,
     deleteNotification,
 } from "../controllers/users-controller.js";
@@ -44,6 +45,12 @@ usersRouter.patch(
     sanitizeChars,
     authorizeUser,
     updatePassword
+);
+usersRouter.patch(
+    "/profile/:id/notifications",
+    sanitizeChars,
+    authorizeUser,
+    updateNotificationSetting
 );
 usersRouter.delete(
     "/profile/:id",
