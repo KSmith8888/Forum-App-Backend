@@ -149,12 +149,28 @@ const getPostsByQuery = wrapper(async (req, res) => {
 });
 
 const getHomePosts = wrapper(async (req, res) => {
-    const popularPosts = await Post.find({ user: { $ne: "Deleted" } })
+    const popularFull = await Post.find({ user: { $ne: "Deleted" } })
         .sort({ likes: "desc" })
         .limit(10);
-    const newPosts = await Post.find({ user: { $ne: "Deleted" } })
+    const popularPosts = popularFull.map((post) => {
+        return {
+            _id: post._id,
+            title: post.title,
+            content: post.content,
+            postType: post.postType,
+        };
+    });
+    const newFull = await Post.find({ user: { $ne: "Deleted" } })
         .sort({ createdAt: "desc" })
         .limit(10);
+    const newPosts = newFull.map((post) => {
+        return {
+            _id: post._id,
+            title: post.title,
+            content: post.content,
+            postType: post.postType,
+        };
+    });
     res.status(200);
     res.json({ popular: popularPosts, new: newPosts });
 });
