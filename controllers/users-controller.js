@@ -218,6 +218,7 @@ const deleteOwnAccount = wrapper(async (req, res) => {
             {
                 user: "Deleted",
                 postType: "Text",
+                title: "This post has been deleted",
                 content: "This post has been deleted",
                 keywords: [],
                 history: [],

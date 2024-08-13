@@ -378,6 +378,7 @@ const deletePost = wrapper(async (req, res) => {
         {
             $set: {
                 user: "Deleted",
+                title: "This post has been deleted",
                 content: "This post has been deleted",
                 postType: "Text",
                 keywords: [],
