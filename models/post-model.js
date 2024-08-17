@@ -49,6 +49,11 @@ const postSchema = new Schema(
             required: true,
             default: [],
         },
+        isPinned: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
         hasBeenEdited: {
             type: Boolean,
             required: true,

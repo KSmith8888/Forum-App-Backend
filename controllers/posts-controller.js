@@ -10,6 +10,7 @@ const createPost = wrapper(async (req, res) => {
     const title = req.body.title;
     const content = req.body.content;
     const postType = req.body.postType;
+    const isPinned = req.body.isPinned ? true : false;
     if (
         !topic ||
         !title ||
@@ -19,6 +20,11 @@ const createPost = wrapper(async (req, res) => {
     ) {
         throw new Error(
             "Bad Request Error: Topic, title or content not provided"
+        );
+    }
+    if (isPinned && req.role !== "admin") {
+        throw new Error(
+            "Bad Request Error: Only admins are allowed to pin posts"
         );
     }
     if (postType !== "Text" && postType !== "Link") {
@@ -53,6 +59,7 @@ const createPost = wrapper(async (req, res) => {
         title: String(title),
         postType: String(postType),
         content: String(content),
+        isPinned,
         topic: String(topic),
         user: dbUser.displayName,
         keywords: keywords,
@@ -152,7 +159,17 @@ const getHomePosts = wrapper(async (req, res) => {
     const popularFull = await Post.find({ user: { $ne: "Deleted" } })
         .sort({ likes: "desc" })
         .limit(10);
-    const popularPosts = popularFull.map((post) => {
+    const pinned = await Post.find({
+        user: { $ne: "Deleted" },
+        isPinned: true,
+    }).limit(10);
+    if (pinned.length > 0) {
+        pinned.forEach((post) => {
+            popularFull.unshift(post);
+        });
+    }
+    const popularTen = popularFull.slice(0, 10);
+    const popularPosts = popularTen.map((post) => {
         return {
             _id: post._id,
             title: post.title,
@@ -362,17 +379,6 @@ const deletePost = wrapper(async (req, res) => {
     if (!userPostIds.includes(postId)) {
         throw new Error("Users can only delete their own posts");
     }
-    const newUserPosts = dbUser.posts.filter((postObj) => {
-        return String(postObj.id) !== postId;
-    });
-    await User.findOneAndUpdate(
-        { _id: String(req.userId) },
-        {
-            $set: {
-                posts: newUserPosts,
-            },
-        }
-    );
     await Post.findOneAndUpdate(
         { _id: String(postId) },
         {
@@ -386,6 +392,17 @@ const deletePost = wrapper(async (req, res) => {
                 hasBeenEdited: false,
                 profileImageName: "blank.png",
                 profileImageAlt: "A generic blank avatar image of a mans head",
+            },
+        }
+    );
+    const newUserPosts = dbUser.posts.filter((postObj) => {
+        return String(postObj.id) !== postId;
+    });
+    await User.findOneAndUpdate(
+        { _id: String(req.userId) },
+        {
+            $set: {
+                posts: newUserPosts,
             },
         }
     );
