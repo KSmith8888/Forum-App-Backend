@@ -14,6 +14,9 @@ const createComment = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Content or post id not provided");
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.comments.length > 300) {
+        throw new Error("Limit Exceeded Error: Comment limit exceeded");
+    }
     const isCommentReply = replyType === "comment" ? true : false;
     const dbComment = await Comment.create({
         content: String(content),
@@ -95,7 +98,7 @@ const createComment = wrapper(async (req, res) => {
             username: replyCommentUsername,
         });
         if (
-            replyCommentUsername !== "Deleted" &&
+            replyCommentUsername !== "deleted" &&
             replyCommentUsername !== dbComment.user.toLowerCase() &&
             userToBeNotified.getReplyNotifications
         ) {

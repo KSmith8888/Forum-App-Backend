@@ -53,7 +53,10 @@ const createPost = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Topic not allowed");
     }
     keywords.push(topic);
-    const dbUser = await User.findOne({ _id: req.userId });
+    const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.posts.length > 100) {
+        throw new Error("Limit Exceeded Error: Post limit exceeded");
+    }
     keywords.push(dbUser.username);
     const dbPost = await Post.create({
         title: String(title),

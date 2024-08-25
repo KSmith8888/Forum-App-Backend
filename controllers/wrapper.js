@@ -35,6 +35,11 @@ const wrapper = (fn) => {
                     message:
                         "Sorry, that username is not available. Please choose a different username",
                 });
+            } else if (err.message.startsWith("Limit Exceeded Error:")) {
+                res.status(429);
+                res.json({
+                    message: "Limit exceeded. Too many posts or comments",
+                });
             } else {
                 res.status(500);
                 res.json({
