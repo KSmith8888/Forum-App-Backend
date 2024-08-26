@@ -1,5 +1,3 @@
-import dotenv from "dotenv";
-dotenv.config();
 import express from "express";
 import rateLimit from "express-rate-limit";
 
@@ -29,7 +27,7 @@ app.use((req, res, next) => {
     try {
         if (!req.headers.origin) {
             res.status(400);
-            res.json({ msg: "Not authorized to access this resource" });
+            res.json({ message: "Not authorized to access this resource" });
         } else {
             res.header(
                 "Access-Control-Allow-Origin",
