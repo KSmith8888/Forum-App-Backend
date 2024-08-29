@@ -51,7 +51,7 @@ const userSchema = new Schema({
         default: [],
     },
     comments: {
-        type: [String],
+        type: [Object],
         required: true,
         default: [],
     },
@@ -71,7 +71,7 @@ const userSchema = new Schema({
         default: [],
     },
     notifications: {
-        type: [Object],
+        type: [String],
         required: true,
         default: [],
     },

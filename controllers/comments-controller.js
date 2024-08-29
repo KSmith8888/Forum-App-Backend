@@ -1,9 +1,8 @@
-import mongoose from "mongoose";
-
 import { wrapper } from "./wrapper.js";
 import { Comment } from "../models/comment-model.js";
 import { Post } from "../models/post-model.js";
 import { User } from "../models/user-model.js";
+import { Notification } from "../models/notification-model.js";
 
 const createComment = wrapper(async (req, res) => {
     const content = req.body.content;
@@ -26,7 +25,14 @@ const createComment = wrapper(async (req, res) => {
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
     });
-    const newComments = [...dbUser.comments, dbComment._id];
+    const newComments = [
+        ...dbUser.comments,
+        {
+            commentId: dbComment._id,
+            content: dbComment.content,
+            relatedPost: dbComment.relatedPost,
+        },
+    ];
     await User.findOneAndUpdate(
         { _id: req.userId },
         {
@@ -60,14 +66,12 @@ const createComment = wrapper(async (req, res) => {
             },
         }
     );
-    const notificationId = new mongoose.Types.ObjectId();
-    const newNotification = {
-        _id: String(notificationId),
+    const newNotification = await Notification.create({
         message: `${dbUser.displayName} replied to your message`,
         type: "Reply",
         replyMessageId: String(postId),
-        commentId: dbComment._id,
-    };
+        commentId: String(dbComment._id),
+    });
     if (!isCommentReply && relatedPost.user !== "Deleted") {
         const replyUsername = relatedPost.user.toLowerCase();
         const userToBeNotified = await User.findOne({
@@ -83,7 +87,7 @@ const createComment = wrapper(async (req, res) => {
                     $set: {
                         notifications: [
                             ...userToBeNotified.notifications,
-                            newNotification,
+                            newNotification._id,
                         ],
                     },
                 }
@@ -108,7 +112,7 @@ const createComment = wrapper(async (req, res) => {
                     $set: {
                         notifications: [
                             ...userToBeNotified.notifications,
-                            newNotification,
+                            newNotification._id,
                         ],
                     },
                 }
@@ -197,8 +201,8 @@ const editComment = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Invalid comment id type provided");
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    const userCommentIds = dbUser.comments.map((id) => {
-        return String(id);
+    const userCommentIds = dbUser.comments.map((comment) => {
+        return String(comment.commentId);
     });
     if (!userCommentIds.includes(commentId)) {
         throw new Error("Users can only edit their own comments");
@@ -237,16 +241,15 @@ const editComment = wrapper(async (req, res) => {
 
 const deleteComment = wrapper(async (req, res) => {
     const commentId = req.params.id;
-    const dbComment = await Comment.findOne({ _id: String(commentId) });
     const dbUser = await User.findOne({ _id: String(req.userId) });
-    const userCommentIds = dbUser.comments.map((id) => {
-        return String(id);
+    const userCommentIds = dbUser.comments.map((comment) => {
+        return String(comment.commentId);
     });
     if (!userCommentIds.includes(commentId)) {
         throw new Error("Users can only delete their own comments");
     }
-    const newUserComments = dbUser.comments.filter((id) => {
-        return String(id) !== commentId;
+    const newUserComments = dbUser.comments.filter((comment) => {
+        return String(comment.commentId) !== commentId;
     });
     await User.findOneAndUpdate(
         { _id: String(req.userId) },

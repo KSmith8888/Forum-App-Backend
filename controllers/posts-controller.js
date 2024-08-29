@@ -76,7 +76,7 @@ const createPost = wrapper(async (req, res) => {
             $set: {
                 posts: [
                     ...dbUser.posts,
-                    { id: dbPost._id, title: dbPost.title },
+                    { postId: dbPost.id, title: dbPost.title },
                 ],
             },
         }
@@ -119,17 +119,8 @@ const getPostsByUser = wrapper(async (req, res) => {
     if (!dbUser) {
         throw new Error("No user account found, it may have been deleted");
     }
-    const commentObjectIds = dbUser.comments.map((id) => {
-        return new mongoose.Types.ObjectId(id);
-    });
-    const userComments = await Comment.find({
-        _id: {
-            $in: commentObjectIds,
-        },
-    });
-    const userPostData = dbUser.posts;
     res.status(200);
-    res.json({ posts: userPostData, comments: userComments });
+    res.json({ posts: dbUser.posts, comments: dbUser.comments });
 });
 
 const getPostsByQuery = wrapper(async (req, res) => {
@@ -271,14 +262,17 @@ const savePost = wrapper(async (req, res) => {
     let didUserSave = true;
     let newSavedPosts = [];
     dbUser.savedPosts.forEach((savedPost) => {
-        if (savedPost.id === postId) {
+        if (savedPost.postId === postId) {
             didUserSave = false;
         } else {
             newSavedPosts.push(savedPost);
         }
     });
     if (didUserSave) {
-        newSavedPosts = [...newSavedPosts, { id: postId, title: postTitle }];
+        newSavedPosts = [
+            ...newSavedPosts,
+            { postId: postId, title: postTitle },
+        ];
     }
     await User.findOneAndUpdate(
         { _id: dbUser._id },
@@ -292,7 +286,7 @@ const savePost = wrapper(async (req, res) => {
     res.json({
         message: "Post saved successfully",
         didUserSave,
-        postId: req.params.id,
+        postId,
     });
 });
 
@@ -322,7 +316,7 @@ const editPost = wrapper(async (req, res) => {
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
-        return String(postObj.id);
+        return String(postObj.postId);
     });
     if (!userPostIds.includes(postId)) {
         throw new Error("Users can only edit their own posts");
@@ -344,7 +338,7 @@ const editPost = wrapper(async (req, res) => {
     const newPostTitle = req.body.title || prevPostTitle;
     const newUserPosts = dbUser.posts.map((postObj) => {
         if (String(postObj.id) === postId) {
-            return { title: newPostTitle, id: postId };
+            return { title: newPostTitle, postId: postId };
         } else {
             return postObj;
         }

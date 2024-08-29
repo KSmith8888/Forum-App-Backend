@@ -5,26 +5,25 @@ import { User } from "../models/user-model.js";
 import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { wrapper } from "./wrapper.js";
+import { Notification } from "../models/notification-model.js";
 
 const getOwnProfile = wrapper(async (req, res) => {
     const userId = req.userId;
     const dbUser = await User.findOne({ _id: String(userId) });
-    const commentObjectIds = dbUser.comments.map((id) => {
-        return new mongoose.Types.ObjectId(id);
+    if (!dbUser) {
+        throw new Error("Not Found Error: No user found with that username");
+    }
+    const notificationObjectIds = dbUser.notifications.map((notificationId) => {
+        return new mongoose.Types.ObjectId(notificationId);
     });
-    const userComments = await Comment.find({
-        _id: {
-            $in: commentObjectIds,
-        },
+    const userNotifications = await Notification.find({
+        "_id": { $in: notificationObjectIds },
     });
-    const userPostData = dbUser.posts;
-    const userNotifications = dbUser.notifications;
-    const userSavedPosts = dbUser.savedPosts;
     res.status(200);
     res.json({
-        posts: userPostData,
-        comments: userComments,
-        savedPosts: userSavedPosts,
+        posts: dbUser.posts,
+        comments: dbUser.comments,
+        savedPosts: dbUser.savedPosts,
         notifications: userNotifications,
         bio: dbUser.profileBio,
         pswdLastUpdated: dbUser.pswdLastUpdated,
@@ -38,24 +37,14 @@ const getUserProfile = wrapper(async (req, res) => {
     if (!dbUser) {
         throw new Error("Not Found Error: No user found with that username");
     }
-    const commentObjectIds = dbUser.comments.map((id) => {
-        return new mongoose.Types.ObjectId(id);
-    });
-    const userComments = await Comment.find({
-        _id: {
-            $in: commentObjectIds,
-        },
-    });
-    const userPostData = dbUser.posts;
     res.status(200);
     res.json({
         username: dbUser.displayName,
-        posts: userPostData,
-        comments: userComments,
+        posts: dbUser.posts,
+        comments: dbUser.comments,
         bio: dbUser.profileBio,
         image: dbUser.profileImageName,
         alt: dbUser.profileImageAlt,
-        replySetting: dbUser.getReplyNotifications,
     });
 });
 
@@ -210,7 +199,7 @@ const updateNotificationSetting = wrapper(async (req, res) => {
 const deleteOwnAccount = wrapper(async (req, res) => {
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
-        return postObj.id;
+        return postObj.postId;
     });
     if (userPostIds.length > 0) {
         await Post.updateMany(
@@ -228,7 +217,9 @@ const deleteOwnAccount = wrapper(async (req, res) => {
             }
         );
     }
-    const userCommentIds = dbUser.comments || [];
+    const userCommentIds = dbUser.posts.map((commentObj) => {
+        return commentObj.commentId;
+    });
     if (userCommentIds.length > 0) {
         await Comment.updateMany(
             { _id: { $in: userCommentIds } },
