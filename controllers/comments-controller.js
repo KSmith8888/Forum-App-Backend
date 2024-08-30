@@ -235,6 +235,25 @@ const editComment = wrapper(async (req, res) => {
             },
         }
     );
+    const newUserComments = dbUser.comments.map((comment) => {
+        if (String(comment.commentId) === commentId) {
+            return {
+                commentId: comment.commentId,
+                content: newContent,
+                relatedPost: comment.relatedPost,
+            };
+        } else {
+            return comment;
+        }
+    });
+    await User.findOneAndUpdate(
+        { _id: String(req.userId) },
+        {
+            $set: {
+                comments: newUserComments,
+            },
+        }
+    );
     res.status(200);
     res.json({ relatedPostId: dbComment.relatedPost });
 });

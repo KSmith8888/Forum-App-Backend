@@ -1,10 +1,9 @@
-import mongoose from "mongoose";
-
 import { wrapper } from "./wrapper.js";
 import { Report } from "../models/report-model.js";
 import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { User } from "../models/user-model.js";
+import { Notification } from "../models/notification-model.js";
 
 const getUserWarnings = wrapper(async (req, res) => {
     const role = req.role;
@@ -18,8 +17,11 @@ const getUserWarnings = wrapper(async (req, res) => {
             "Not Found Error: No user found matching those credentials"
         );
     }
-    const userWarnings = dbUser.notifications.filter(
-        (note) => note.type === "Warning"
+    const userNotifications = await Notification.find({
+        "_id": { $in: dbUser.notifications },
+    });
+    const userWarnings = userNotifications.filter(
+        (notification) => notification.type === "Warning"
     );
     res.status(200);
     res.json({
@@ -45,19 +47,16 @@ const sendUserNotification = wrapper(async (req, res) => {
     if (!notificationMsg || typeof notificationMsg !== "string") {
         throw new Error("Bad Request Error: Notification message not provided");
     }
-    const notificationId = new mongoose.Types.ObjectId();
-    const newNotification = {
-        _id: String(notificationId),
+
+    const newNotification = await Notification.create({
         message: notificationMsg,
         type: notificationType,
-        replyMessageId: "none",
-        commentId: "none",
-    };
+    });
     await User.findOneAndUpdate(
         { username: username },
         {
             $set: {
-                notifications: [...dbUser.notifications, newNotification],
+                notifications: [...dbUser.notifications, newNotification._id],
             },
         }
     );
@@ -221,8 +220,8 @@ const deleteUsersComment = wrapper(async (req, res) => {
     if (!commentCreator) {
         throw new Error("Not Found Error: No user with that username found");
     }
-    const newUserComments = commentCreator.comments.filter((id) => {
-        return String(id) !== commentId;
+    const newUserComments = commentCreator.comments.filter((comment) => {
+        return String(comment.commentId) !== commentId;
     });
     await User.findOneAndUpdate(
         {

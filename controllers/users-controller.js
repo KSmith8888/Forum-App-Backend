@@ -245,9 +245,12 @@ const deleteNotification = wrapper(async (req, res) => {
         throw new Error("Must provide user ID and notification ID");
     }
     const dbUser = await User.findOne({ _id: String(userId) });
-    const matchingNotification = dbUser.notifications.find(
-        (note) => note._id === notificationId
+    const notificationObjectId = new mongoose.Types.ObjectId(
+        String(notificationId)
     );
+    const matchingNotification = await Notification.find({
+        _id: notificationObjectId,
+    });
     if (!matchingNotification) {
         throw new Error("No notification found matching that id");
     }
@@ -255,8 +258,9 @@ const deleteNotification = wrapper(async (req, res) => {
         throw new Error("You are not authorized to perform this action");
     }
     const newNotifications = dbUser.notifications.filter(
-        (notification) => String(notification._id) !== notificationId
+        (notification) => String(notification) !== notificationId
     );
+    await Notification.findByIdAndDelete({ _id: String(notificationId) });
     await User.findOneAndUpdate(
         { _id: String(userId) },
         {

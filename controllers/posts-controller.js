@@ -4,6 +4,7 @@ import { wrapper } from "./wrapper.js";
 import { Post } from "../models/post-model.js";
 import { User } from "../models/user-model.js";
 import { Comment } from "../models/comment-model.js";
+import { Notification } from "../models/notification-model.js";
 
 const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic.toLowerCase();
@@ -227,19 +228,17 @@ const likePost = wrapper(async (req, res) => {
         const dbPostCreator = await User.findOne({
             username: postCreatorUsername,
         });
-        const notificationId = new mongoose.Types.ObjectId();
-        const newNotification = {
-            _id: String(notificationId),
+        const newNotification = await Notification.create({
             message: `Your post, ${dbPost.title}, has ${dbPost.likes} likes`,
-            isReply: false,
-        };
+            type: "Achievement",
+        });
         await User.findOneAndUpdate(
             { username: postCreatorUsername },
             {
                 $set: {
                     notifications: [
                         ...dbPostCreator.notifications,
-                        newNotification,
+                        newNotification._id,
                     ],
                 },
             }
@@ -335,10 +334,9 @@ const editPost = wrapper(async (req, res) => {
         timestamp: prevTimestamp,
         id: prevPostId,
     };
-    const newPostTitle = req.body.title || prevPostTitle;
     const newUserPosts = dbUser.posts.map((postObj) => {
-        if (String(postObj.id) === postId) {
-            return { title: newPostTitle, postId: postId };
+        if (String(postObj.postId) === postId) {
+            return { title: dbPost.title, postId: postId };
         } else {
             return postObj;
         }
@@ -355,7 +353,6 @@ const editPost = wrapper(async (req, res) => {
         { _id: String(postId) },
         {
             $set: {
-                title: String(newPostTitle),
                 content: String(newPostContent),
                 hasBeenEdited: true,
                 lastEditedAt: new Date(),
@@ -371,7 +368,7 @@ const deletePost = wrapper(async (req, res) => {
     const postId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
-        return String(postObj.id);
+        return String(postObj.postId);
     });
     if (!userPostIds.includes(postId)) {
         throw new Error("Users can only delete their own posts");
@@ -393,7 +390,7 @@ const deletePost = wrapper(async (req, res) => {
         }
     );
     const newUserPosts = dbUser.posts.filter((postObj) => {
-        return String(postObj.id) !== postId;
+        return String(postObj.postId) !== postId;
     });
     await User.findOneAndUpdate(
         { _id: String(req.userId) },
