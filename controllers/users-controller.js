@@ -1,5 +1,4 @@
 import bcrypt from "bcrypt";
-import mongoose from "mongoose";
 
 import { User } from "../models/user-model.js";
 import { Post } from "../models/post-model.js";
@@ -13,11 +12,8 @@ const getOwnProfile = wrapper(async (req, res) => {
     if (!dbUser) {
         throw new Error("Not Found Error: No user found with that username");
     }
-    const notificationObjectIds = dbUser.notifications.map((notificationId) => {
-        return new mongoose.Types.ObjectId(notificationId);
-    });
     const userNotifications = await Notification.find({
-        "_id": { $in: notificationObjectIds },
+        "_id": { $in: dbUser.notifications },
     });
     res.status(200);
     res.json({
@@ -241,15 +237,12 @@ const deleteOwnAccount = wrapper(async (req, res) => {
 const deleteNotification = wrapper(async (req, res) => {
     const userId = req.userId;
     const notificationId = req.params.id;
-    if (!userId || !notificationId) {
+    if (!userId || !notificationId || typeof notificationId !== "string") {
         throw new Error("Must provide user ID and notification ID");
     }
     const dbUser = await User.findOne({ _id: String(userId) });
-    const notificationObjectId = new mongoose.Types.ObjectId(
-        String(notificationId)
-    );
     const matchingNotification = await Notification.find({
-        _id: notificationObjectId,
+        _id: notificationId,
     });
     if (!matchingNotification) {
         throw new Error("No notification found matching that id");

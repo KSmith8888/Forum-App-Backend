@@ -1,5 +1,3 @@
-import mongoose from "mongoose";
-
 import { wrapper } from "./wrapper.js";
 import { Post } from "../models/post-model.js";
 import { User } from "../models/user-model.js";
@@ -321,18 +319,15 @@ const editPost = wrapper(async (req, res) => {
         throw new Error("Users can only edit their own posts");
     }
     const prevPostHistory = dbPost.history || [];
-    const prevPostTitle = dbPost.title;
     const prevPostContent = dbPost.content;
     const prevTimestamp =
         dbPost.createdAt !== dbPost.lastEditedAt
             ? dbPost.lastEditedAt
             : dbPost.createdAt;
-    const prevPostId = new mongoose.Types.ObjectId();
     const prevPostVersion = {
-        title: prevPostTitle,
         content: prevPostContent,
         timestamp: prevTimestamp,
-        id: prevPostId,
+        editNumber: dbPost.history.length + 1,
     };
     const newUserPosts = dbUser.posts.map((postObj) => {
         if (String(postObj.postId) === postId) {
