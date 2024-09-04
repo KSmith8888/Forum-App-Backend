@@ -26,12 +26,12 @@ const createComment = wrapper(async (req, res) => {
         profileImageAlt: dbUser.profileImageAlt,
     });
     const newComments = [
-        ...dbUser.comments,
         {
             commentId: dbComment._id,
             content: dbComment.content,
             relatedPost: dbComment.relatedPost,
         },
+        ...dbUser.comments,
     ];
     await User.findOneAndUpdate(
         { _id: req.userId },
