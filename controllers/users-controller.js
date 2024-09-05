@@ -241,14 +241,16 @@ const deleteNotification = wrapper(async (req, res) => {
         throw new Error("Must provide user ID and notification ID");
     }
     const dbUser = await User.findOne({ _id: String(userId) });
-    const matchingNotification = await Notification.find({
+    const matchingNotification = await Notification.findOne({
         _id: notificationId,
     });
     if (!matchingNotification) {
         throw new Error("No notification found matching that id");
     }
     if (matchingNotification.type === "Warning" && req.role !== "admin") {
-        throw new Error("You are not authorized to perform this action");
+        throw new Error(
+            "Not Authorized Error: User attempted to delete warning"
+        );
     }
     const newNotifications = dbUser.notifications.filter(
         (notification) => String(notification) !== notificationId
