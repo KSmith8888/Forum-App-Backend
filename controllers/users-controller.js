@@ -20,7 +20,7 @@ const getOwnProfile = wrapper(async (req, res) => {
         posts: dbUser.posts,
         comments: dbUser.comments,
         savedPosts: dbUser.savedPosts,
-        notifications: userNotifications,
+        notifications: userNotifications.reverse(),
         bio: dbUser.profileBio,
         pswdLastUpdated: dbUser.pswdLastUpdated,
         replySetting: dbUser.getReplyNotifications,

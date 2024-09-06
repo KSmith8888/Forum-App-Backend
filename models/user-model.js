@@ -46,12 +46,23 @@ const userSchema = new Schema({
         default: "Last updated at account creation",
     },
     posts: {
-        type: [Object],
+        type: [
+            {
+                title: { type: String, required: true },
+                postId: { type: String, required: true },
+            },
+        ],
         required: true,
         default: [],
     },
     comments: {
-        type: [Object],
+        type: [
+            {
+                commentId: { type: String, required: true },
+                content: { type: String, required: true },
+                relatedPost: { type: String, required: true },
+            },
+        ],
         required: true,
         default: [],
     },
@@ -61,7 +72,12 @@ const userSchema = new Schema({
         default: [],
     },
     savedPosts: {
-        type: [Object],
+        type: [
+            {
+                title: { type: String, required: true },
+                postId: { type: String, required: true },
+            },
+        ],
         required: true,
         default: [],
     },

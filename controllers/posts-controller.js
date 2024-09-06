@@ -267,8 +267,8 @@ const savePost = wrapper(async (req, res) => {
     });
     if (didUserSave) {
         newSavedPosts = [
-            ...newSavedPosts,
             { postId: postId, title: postTitle },
+            ...newSavedPosts,
         ];
     }
     await User.findOneAndUpdate(
