@@ -30,7 +30,13 @@ const createPost = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Post type is not valid");
     }
     if (postType === "Link") {
-        if (!content.startsWith("https://") || content.includes(" ")) {
+        const isValid = URL.canParse(content);
+        if (
+            !isValid ||
+            !content.startsWith("https://") ||
+            content.includes(" ") ||
+            !content.includes(".")
+        ) {
             throw new Error("Bad Request Error: Invalid link provided");
         }
     }
