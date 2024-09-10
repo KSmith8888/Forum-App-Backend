@@ -1,38 +1,23 @@
 function sanitizeChars(req, res, next) {
     try {
-        const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@-]+$");
+        const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@\r\n-]+$");
         if (
             (req.params.id && !reg.test(req.params.id)) ||
             (req.params.topic && !reg.test(req.params.topic)) ||
-            (req.params.query && !reg.test(req.params.query))
+            (req.params.query && !reg.test(req.params.query)) ||
+            (req.params.username && !reg.test(req.params.username))
         ) {
             throw new Error("Param text is not valid");
         }
         const bodyValues = Object.values(req.body);
         for (let value of bodyValues) {
-            if (
-                typeof value !== "string" &&
-                typeof value !== "object" &&
-                typeof value !== "number"
-            ) {
+            if (typeof value !== "string" && typeof value !== "number") {
                 throw new Error("User input not valid: Not accepted type");
             }
             if (value === "") {
                 value = undefined;
             }
-            if (typeof value === "object" && !Array.isArray(value)) {
-                throw new Error("User input not valid: Non-array object");
-            }
-            if (Array.isArray(value)) {
-                value.forEach((str) => {
-                    if (!reg.test(str)) {
-                        throw new Error("User input not valid: Array input");
-                    }
-                    if (str.includes("data:") || str.includes("javascript:")) {
-                        throw new Error("Value includes invalid scheme");
-                    }
-                });
-            } else if (typeof value === "string") {
+            if (typeof value === "string") {
                 if (!reg.test(value)) {
                     throw new Error("User input not valid: String input");
                 }
@@ -41,6 +26,10 @@ function sanitizeChars(req, res, next) {
                     value.toLowerCase().includes("javascript:")
                 ) {
                     throw new Error("Value includes invalid scheme");
+                }
+            } else {
+                if (!reg.test(value)) {
+                    throw new Error("User input not valid: Number input");
                 }
             }
         }
