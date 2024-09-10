@@ -1,6 +1,6 @@
 function sanitizeChars(req, res, next) {
     try {
-        const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@-]+$", "m");
+        const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@-]+$");
         if (
             (req.params.id && !reg.test(req.params.id)) ||
             (req.params.topic && !reg.test(req.params.topic)) ||
@@ -28,16 +28,19 @@ function sanitizeChars(req, res, next) {
                     if (!reg.test(str)) {
                         throw new Error("User input not valid: Array input");
                     }
-                    if (str.includes("data:")) {
-                        throw new Error("Value includes data url");
+                    if (str.includes("data:") || str.includes("javascript:")) {
+                        throw new Error("Value includes invalid scheme");
                     }
                 });
             } else if (typeof value === "string") {
                 if (!reg.test(value)) {
                     throw new Error("User input not valid: String input");
                 }
-                if (value.includes("data:")) {
-                    throw new Error("Value includes data url");
+                if (
+                    value.toLowerCase().includes("data:") ||
+                    value.toLowerCase().includes("javascript:")
+                ) {
+                    throw new Error("Value includes invalid scheme");
                 }
             }
         }
