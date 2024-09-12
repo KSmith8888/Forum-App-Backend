@@ -1,11 +1,12 @@
 function sanitizeChars(req, res, next) {
     try {
         const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@\r\n-]+$");
+        const paramReg = new RegExp("^[a-zA-Z0-9 _]+$");
         if (
-            (req.params.id && !reg.test(req.params.id)) ||
-            (req.params.topic && !reg.test(req.params.topic)) ||
-            (req.params.query && !reg.test(req.params.query)) ||
-            (req.params.username && !reg.test(req.params.username))
+            (req.params.id && !paramReg.test(req.params.id)) ||
+            (req.params.topic && !paramReg.test(req.params.topic)) ||
+            (req.params.query && !paramReg.test(req.params.query)) ||
+            (req.params.username && !paramReg.test(req.params.username))
         ) {
             throw new Error("Param text is not valid");
         }
@@ -26,6 +27,28 @@ function sanitizeChars(req, res, next) {
                     value.toLowerCase().includes("javascript:")
                 ) {
                     throw new Error("Value includes invalid scheme");
+                }
+                if (value.includes("https://")) {
+                    const attemptedLinks = [];
+                    const contentWords = value.split(" ");
+                    const reg = new RegExp("^[a-zA-Z0-9.:/_-]+$");
+                    contentWords.forEach((word) => {
+                        if (word.startsWith("https://")) {
+                            attemptedLinks.push(word);
+                        }
+                    });
+                    attemptedLinks.forEach((link) => {
+                        const isValid = URL.canParse(link);
+                        if (
+                            !isValid ||
+                            !reg.test(link) ||
+                            !link.includes(".")
+                        ) {
+                            throw new Error(
+                                "Bad Request Error: Invalid link content provided"
+                            );
+                        }
+                    });
                 }
             } else {
                 if (!reg.test(value)) {

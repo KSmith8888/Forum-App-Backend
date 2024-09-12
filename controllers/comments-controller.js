@@ -12,6 +12,9 @@ const createComment = wrapper(async (req, res) => {
     if (!content || !postId || !replyType) {
         throw new Error("Bad Request Error: Content or post id not provided");
     }
+    if (typeof content !== "string") {
+        throw new Error("Bad Request Error: Invalid content provided");
+    }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     if (dbUser.comments.length > 300) {
         throw new Error("Limit Exceeded Error: Comment limit exceeded");
@@ -27,7 +30,7 @@ const createComment = wrapper(async (req, res) => {
     });
     const newComments = [
         {
-            commentId: dbComment._id,
+            commentId: String(dbComment._id),
             content: dbComment.content,
             relatedPost: dbComment.relatedPost,
         },

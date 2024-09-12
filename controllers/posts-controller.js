@@ -10,6 +10,7 @@ const createPost = wrapper(async (req, res) => {
     const content = req.body.content;
     const postType = req.body.postType;
     const isPinned = req.body.isPinned ? true : false;
+    const keywordString = req.body.keywords;
     if (
         !topic ||
         !title ||
@@ -29,21 +30,10 @@ const createPost = wrapper(async (req, res) => {
     if (postType !== "Text" && postType !== "Link") {
         throw new Error("Bad Request Error: Post type is not valid");
     }
-    if (postType === "Link") {
-        const reg = new RegExp("^[a-zA-Z0-9.:/_-]+$");
-        const isValid = URL.canParse(content);
-        if (
-            !isValid ||
-            !reg.test(content) ||
-            !content.startsWith("https://") ||
-            !content.includes(".")
-        ) {
-            throw new Error("Bad Request Error: Invalid link provided");
-        }
+    if (keywordString && typeof keywordString !== "string") {
+        throw new Error("Bad Request Error: Invalid keywords provided");
     }
-    const initialKeywords = req.body.keywords
-        ? req.body.keywords.split(" ")
-        : [];
+    const initialKeywords = keywordString ? keywordString.split(" ") : [];
     const keywords = initialKeywords.map((keyword) => keyword.toLowerCase());
     const allowedTopics = [
         "programming",
@@ -81,7 +71,7 @@ const createPost = wrapper(async (req, res) => {
         {
             $set: {
                 posts: [
-                    { postId: dbPost.id, title: dbPost.title },
+                    { postId: String(dbPost._id), title: dbPost.title },
                     ...dbUser.posts,
                 ],
             },
@@ -307,16 +297,8 @@ const editPost = wrapper(async (req, res) => {
         throw new Error("Maximum number of edits reached");
     }
     const newPostContent = req.body.content;
-    if (!newPostContent) {
-        throw new Error("No post content was provided");
-    }
-    if (dbPost.postType === "Link") {
-        if (
-            !newPostContent.startsWith("https://") ||
-            newPostContent.includes(" ")
-        ) {
-            throw new Error("Bad Request Error: Cannot change post type");
-        }
+    if (!newPostContent || typeof newPostContent !== "string") {
+        throw new Error("No post content or invalid post content was provided");
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
