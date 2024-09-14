@@ -9,7 +9,7 @@ const createPost = wrapper(async (req, res) => {
     const title = req.body.title;
     const content = req.body.content;
     const postType = req.body.postType;
-    const isPinned = req.body.isPinned ? true : false;
+    const isPinned = req.body.isPinned === "pinned" ? true : false;
     const keywordString = req.body.keywords;
     if (
         !topic ||
@@ -33,7 +33,8 @@ const createPost = wrapper(async (req, res) => {
     if (keywordString && typeof keywordString !== "string") {
         throw new Error("Bad Request Error: Invalid keywords provided");
     }
-    const initialKeywords = keywordString ? keywordString.split(" ") : [];
+    const initialKeywords =
+        keywordString !== "none" ? keywordString.split(" ") : [];
     const keywords = initialKeywords.map((keyword) => keyword.toLowerCase());
     const allowedTopics = [
         "programming",

@@ -43,7 +43,8 @@ const sendUserNotification = wrapper(async (req, res) => {
         );
     }
     const notificationMsg = req.body.notificationMsg;
-    const notificationType = req.body.isWarning ? "Warning" : "Notice";
+    const notificationType =
+        req.body.isWarning === "Warning" ? "Warning" : "Notice";
     if (!notificationMsg || typeof notificationMsg !== "string") {
         throw new Error("Bad Request Error: Notification message not provided");
     }
@@ -68,7 +69,7 @@ const banUser = wrapper(async (req, res) => {
     const bannedUser = req.body.banUser;
     const banTimestamp = req.body.banTimestamp;
     const username = req.params.username.toLowerCase();
-    const dbUser = await User.findOne({ username: username });
+    const dbUser = await User.findOne({ username: String(username) });
     if (!dbUser) {
         throw new Error(
             "Not Found Error: No user found matching those credentials"
@@ -81,7 +82,7 @@ const banUser = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Ban info not provided");
     }
     await User.findOneAndUpdate(
-        { username: username },
+        { username: String(username) },
         {
             $set: {
                 isBanned: true,
