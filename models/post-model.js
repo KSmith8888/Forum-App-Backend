@@ -65,7 +65,14 @@ const postSchema = new Schema(
             default: new Date(),
         },
         history: {
-            type: [Object],
+            type: [
+                {
+                    content: { type: String, required: true },
+                    timestamp: { type: Date, required: true },
+                    editNumber: { type: String, required: true },
+                    _id: false,
+                },
+            ],
             required: true,
             default: [],
         },

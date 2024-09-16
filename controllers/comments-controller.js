@@ -226,7 +226,11 @@ const editComment = wrapper(async (req, res) => {
         dbComment.createdAt !== dbComment.updatedAt
             ? dbComment.updatedAt
             : dbComment.createdAt;
-    const prevComment = { content: prevContent, timestamp: prevTimestamp };
+    const prevComment = {
+        content: prevContent,
+        timestamp: prevTimestamp,
+        editNumber: dbComment.history.length + 1,
+    };
     const prevHistory = dbComment.history || [];
     await Comment.findOneAndUpdate(
         { _id: dbComment._id },
