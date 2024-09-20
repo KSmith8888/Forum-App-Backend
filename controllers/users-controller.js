@@ -50,10 +50,13 @@ const createNewUser = wrapper(async (req, res) => {
             "Bad Request Error: Registration info was not provided"
         );
     }
+    const usernameReg = new RegExp("^[a-zA-Z0-9_]+$");
+    const passwordReg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
     if (
         typeof req.body.username !== "string" ||
         typeof req.body.password !== "string" ||
-        req.body.password.includes(" ")
+        !passwordReg.test(req.body.password) ||
+        !usernameReg.test(req.body.username)
     ) {
         throw new Error(
             "Bad Request Error: Username or password not in proper format"
@@ -67,7 +70,7 @@ const createNewUser = wrapper(async (req, res) => {
     }
     const password = req.body.password;
     const requestedUsername = await User.findOne({
-        username: username,
+        username: String(username),
     });
     if (requestedUsername?.username) {
         throw new Error("Username unavailable Error: Duplicate entry");
@@ -75,14 +78,12 @@ const createNewUser = wrapper(async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
     const currentDate = new Date().toDateString();
-    const userInfo = {
-        username: username,
-        password: hashedPassword,
+    await User.create({
+        username: String(username),
+        password: String(hashedPassword),
         displayName: String(displayName),
         pswdLastUpdated: `Last updated - ${currentDate}`,
-    };
-    await User.create(userInfo);
-
+    });
     res.status(201);
     res.json({
         message: "New account created successfully",
