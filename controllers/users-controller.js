@@ -142,8 +142,10 @@ const updatePassword = wrapper(async (req, res) => {
     const userId = req.userId;
     const currentPassword = req.body.reqCurrentPass;
     const newPassword = req.body.reqNewPass;
-    if (!currentPassword || newPassword) {
-        throw new Error("Must provide current password and new password");
+    if (!currentPassword || !newPassword) {
+        throw new Error(
+            "Bad Request Error: Current or new password was not provided"
+        );
     }
     const dbUser = await User.findOne({ _id: String(userId) });
     const hashedPassword = await bcrypt.compare(
