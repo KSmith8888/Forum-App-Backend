@@ -30,6 +30,11 @@ const commentSchema = new Schema(
             required: true,
             default: false,
         },
+        lastEditedAt: {
+            type: String,
+            required: true,
+            default: "unedited",
+        },
         history: {
             type: [
                 {

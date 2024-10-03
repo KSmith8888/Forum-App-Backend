@@ -310,10 +310,11 @@ const editPost = wrapper(async (req, res) => {
     }
     const prevPostHistory = dbPost.history || [];
     const prevPostContent = dbPost.content;
+    const currentDate = new Date().toUTCString();
     const prevTimestamp =
-        dbPost.createdAt !== dbPost.lastEditedAt
-            ? dbPost.lastEditedAt
-            : dbPost.createdAt;
+        dbPost.lastEditedAt === "unedited"
+            ? String(dbPost.createdAt)
+            : String(dbPost.lastEditedAt);
     const prevPostVersion = {
         content: prevPostContent,
         timestamp: prevTimestamp,
@@ -340,7 +341,7 @@ const editPost = wrapper(async (req, res) => {
             $set: {
                 content: String(newPostContent),
                 hasBeenEdited: true,
-                lastEditedAt: new Date(),
+                lastEditedAt: String(currentDate),
                 history: [...prevPostHistory, prevPostVersion],
             },
         }

@@ -69,12 +69,12 @@ const createComment = wrapper(async (req, res) => {
             },
         }
     );
-    const newNotification = await Notification.create({
+    const newNotificationData = {
         message: `${dbUser.displayName} replied to your message`,
         type: "Reply",
         replyMessageId: String(postId),
         commentId: String(dbComment._id),
-    });
+    };
     if (!isCommentReply && relatedPost.user !== "Deleted") {
         const replyUsername = relatedPost.user.toLowerCase();
         const userToBeNotified = await User.findOne({
@@ -84,6 +84,9 @@ const createComment = wrapper(async (req, res) => {
             dbComment.user.toLowerCase() !== relatedPost.user.toLowerCase() &&
             userToBeNotified.getReplyNotifications
         ) {
+            const newNotification = await Notification.create(
+                newNotificationData
+            );
             await User.findOneAndUpdate(
                 { username: replyUsername },
                 {
@@ -109,6 +112,9 @@ const createComment = wrapper(async (req, res) => {
             replyCommentUsername !== dbComment.user.toLowerCase() &&
             userToBeNotified.getReplyNotifications
         ) {
+            const newNotification = await Notification.create(
+                newNotificationData
+            );
             await User.findOneAndUpdate(
                 { username: replyCommentUsername },
                 {
@@ -222,10 +228,11 @@ const editComment = wrapper(async (req, res) => {
         throw new Error("Maximum number of edits reached");
     }
     const prevContent = dbComment.content;
+    const currentDate = new Date().toUTCString();
     const prevTimestamp =
-        dbComment.createdAt !== dbComment.updatedAt
-            ? dbComment.updatedAt
-            : dbComment.createdAt;
+        dbComment.lastEditedAt === "unedited"
+            ? String(dbComment.createdAt)
+            : String(dbComment.lastEditedAt);
     const prevComment = {
         content: prevContent,
         timestamp: prevTimestamp,
@@ -238,6 +245,7 @@ const editComment = wrapper(async (req, res) => {
             $set: {
                 content: newContent,
                 hasBeenEdited: true,
+                lastEditedAt: String(currentDate),
                 history: [...prevHistory, prevComment],
             },
         }

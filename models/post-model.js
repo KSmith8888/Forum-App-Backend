@@ -60,9 +60,9 @@ const postSchema = new Schema(
             default: false,
         },
         lastEditedAt: {
-            type: Date,
+            type: String,
             required: true,
-            default: new Date(),
+            default: "unedited",
         },
         history: {
             type: [
