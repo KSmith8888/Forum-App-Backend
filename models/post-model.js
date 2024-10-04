@@ -7,14 +7,14 @@ const postSchema = new Schema(
         title: {
             type: String,
             required: true,
-            minlength: 4,
+            minlength: 8,
             maxlength: 60,
             trim: true,
         },
         content: {
             type: String,
             required: true,
-            minlength: 4,
+            minlength: 12,
             maxlength: 900,
         },
         postType: {
