@@ -130,11 +130,10 @@ const updateProfileBio = wrapper(async (req, res) => {
             },
         }
     );
-    const currentDate = new Date();
+    const currentDate = Date.now();
     res.status(200);
     res.json({
-        message: "Bio updated successfully",
-        bioUpdatedAt: currentDate.toDateString(),
+        message: `Bio updated successfully-Target ID-${currentDate}`,
     });
 });
 
@@ -172,7 +171,7 @@ const updatePassword = wrapper(async (req, res) => {
 
     res.status(200);
     res.json({
-        message: `Password updated - ${currentDate}`,
+        message: `Password updated successfully-Target ID-${Date.now()}`,
     });
 });
 
@@ -190,7 +189,6 @@ const updateNotificationSetting = wrapper(async (req, res) => {
     const isSettingOn = newSetting ? "On" : "Off";
     res.status(200);
     res.json({
-        replySetting: newSetting,
         message: `Reply notifications are now turned ${isSettingOn}`,
     });
 });
