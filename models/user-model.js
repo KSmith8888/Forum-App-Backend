@@ -8,14 +8,12 @@ const userSchema = new Schema({
         minlength: 4,
         maxlength: 18,
         unique: true,
-        trim: true,
     },
     password: {
         type: String,
         required: true,
         minlength: 8,
         maxlength: 180,
-        trim: true,
     },
     role: {
         type: String,
@@ -28,7 +26,6 @@ const userSchema = new Schema({
         minlength: 4,
         maxlength: 18,
         unique: true,
-        trim: true,
     },
     isBanned: {
         type: Boolean,
@@ -50,6 +47,7 @@ const userSchema = new Schema({
             {
                 title: { type: String, required: true },
                 postId: { type: String, required: true },
+                _id: false,
             },
         ],
         required: true,
@@ -61,6 +59,7 @@ const userSchema = new Schema({
                 commentId: { type: String, required: true },
                 content: { type: String, required: true },
                 relatedPost: { type: String, required: true },
+                _id: false,
             },
         ],
         required: true,
@@ -76,6 +75,7 @@ const userSchema = new Schema({
             {
                 title: { type: String, required: true },
                 postId: { type: String, required: true },
+                _id: false,
             },
         ],
         required: true,
