@@ -17,6 +17,12 @@ const postSchema = new Schema(
             minlength: 12,
             maxlength: 900,
         },
+        previewText: {
+            type: String,
+            required: true,
+            minlength: 12,
+            maxlength: 90,
+        },
         postType: {
             type: String,
             required: true,

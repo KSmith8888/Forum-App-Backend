@@ -55,10 +55,18 @@ const createPost = wrapper(async (req, res) => {
         throw new Error("Limit Exceeded Error: Post limit exceeded");
     }
     keywords.push(dbUser.username);
+    if (postType === "Link" && content.length > 90) {
+        throw new Error("Bad Request Error: Link content limit exceeded");
+    }
+    const showFullContent = content.length <= 50 || postType === "Link";
+    const preview = showFullContent
+        ? content
+        : `${content.substring(0, 50)}...`;
     const dbPost = await Post.create({
         title: String(title),
         postType: String(postType),
         content: String(content),
+        previewText: String(preview),
         isPinned,
         topic: String(topic),
         user: dbUser.displayName,
@@ -164,7 +172,7 @@ const getHomePosts = wrapper(async (req, res) => {
         return {
             _id: post._id,
             title: post.title,
-            content: post.content,
+            previewText: post.previewText,
             postType: post.postType,
         };
     });
@@ -175,7 +183,7 @@ const getHomePosts = wrapper(async (req, res) => {
         return {
             _id: post._id,
             title: post.title,
-            content: post.content,
+            previewText: post.previewText,
             postType: post.postType,
         };
     });
@@ -366,6 +374,7 @@ const deletePost = wrapper(async (req, res) => {
                 user: "Deleted",
                 title: "This post has been deleted",
                 content: "This post has been deleted",
+                previewText: "This post has been deleted",
                 postType: "Text",
                 keywords: [],
                 history: [],

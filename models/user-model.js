@@ -57,7 +57,7 @@ const userSchema = new Schema({
         type: [
             {
                 commentId: { type: String, required: true },
-                content: { type: String, required: true },
+                previewText: { type: String, required: true },
                 relatedPost: { type: String, required: true },
                 _id: false,
             },

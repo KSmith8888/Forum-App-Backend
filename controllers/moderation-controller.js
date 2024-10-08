@@ -192,6 +192,7 @@ const deleteUsersPost = wrapper(async (req, res) => {
                 postType: "Text",
                 title: "This post has been deleted",
                 content: "This post has been deleted",
+                previewText: "This post has been deleted",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
@@ -240,6 +241,7 @@ const deleteUsersComment = wrapper(async (req, res) => {
             $set: {
                 user: "Deleted",
                 content: "This comment has been deleted",
+                previewText: "This comment has been deleted",
                 history: [],
                 hasBeenEdited: false,
                 profileImageName: "blank.png",
@@ -278,6 +280,7 @@ const deleteUsersAccount = wrapper(async (req, res) => {
                 user: "Deleted",
                 postType: "Text",
                 content: "This post has been deleted",
+                previewText: "This post has been deleted",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
@@ -293,6 +296,7 @@ const deleteUsersAccount = wrapper(async (req, res) => {
             {
                 user: "Deleted",
                 content: "This comment has been deleted",
+                previewText: "This comment has been deleted",
                 history: [],
                 hasBeenEdited: false,
                 profileImageName: "blank.png",

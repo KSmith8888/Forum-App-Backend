@@ -9,6 +9,12 @@ const commentSchema = new Schema(
             minlength: 4,
             maxlength: 300,
         },
+        previewText: {
+            type: String,
+            required: true,
+            minlength: 4,
+            maxlength: 55,
+        },
         likes: {
             type: Number,
             required: true,

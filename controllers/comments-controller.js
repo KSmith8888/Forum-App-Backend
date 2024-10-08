@@ -20,8 +20,11 @@ const createComment = wrapper(async (req, res) => {
         throw new Error("Limit Exceeded Error: Comment limit exceeded");
     }
     const isCommentReply = replyType === "comment" ? true : false;
+    const preview =
+        content.length <= 50 ? content : `${content.substring(0, 50)}...`;
     const dbComment = await Comment.create({
         content: String(content),
+        previewText: String(preview),
         relatedPost: String(postId),
         commentReply: isCommentReply,
         user: dbUser.displayName,
@@ -31,7 +34,7 @@ const createComment = wrapper(async (req, res) => {
     const newComments = [
         {
             commentId: String(dbComment._id),
-            content: dbComment.content,
+            previewText: String(preview),
             relatedPost: dbComment.relatedPost,
         },
         ...dbUser.comments,
@@ -299,6 +302,7 @@ const deleteComment = wrapper(async (req, res) => {
             $set: {
                 user: "Deleted",
                 content: "This comment has been deleted",
+                previewText: "This comment has been deleted",
                 history: [],
                 hasBeenEdited: false,
                 profileImageName: "blank.png",
