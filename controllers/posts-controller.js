@@ -55,13 +55,11 @@ const createPost = wrapper(async (req, res) => {
         throw new Error("Limit Exceeded Error: Post limit exceeded");
     }
     keywords.push(dbUser.username);
-    if (postType === "Link" && content.length > 90) {
+    if (postType === "Link" && content.length > 200) {
         throw new Error("Bad Request Error: Link content limit exceeded");
     }
-    const showFullContent = content.length <= 50 || postType === "Link";
-    const preview = showFullContent
-        ? content
-        : `${content.substring(0, 50)}...`;
+    const preview =
+        content.length < 50 ? content : `${content.substring(0, 50)}...`;
     const dbPost = await Post.create({
         title: String(title),
         postType: String(postType),
@@ -110,12 +108,20 @@ const getPost = wrapper(async (req, res) => {
 
 const getPostsByTopic = wrapper(async (req, res) => {
     const postsTopic = req.params.topic.toLowerCase();
-    const requestedPost = await Post.find({
+    const topicResults = await Post.find({
         topic: String(postsTopic),
         user: { $ne: "Deleted" },
     }).limit(20);
+    const topicPosts = topicResults.map((post) => {
+        return {
+            _id: post._id,
+            title: post.title,
+            previewText: post.previewText,
+            postType: post.postType,
+        };
+    });
     res.status(200);
-    res.json(requestedPost);
+    res.json(topicPosts);
 });
 
 const getPostsByUser = wrapper(async (req, res) => {
@@ -129,29 +135,23 @@ const getPostsByUser = wrapper(async (req, res) => {
 });
 
 const getPostsByQuery = wrapper(async (req, res) => {
-    let query = req.params.query;
-    if (!query || typeof query !== "string") {
+    if (!req.params.query || typeof req.params.query !== "string") {
         throw new Error("User did not submit a valid query");
     }
-    query = query.toLowerCase();
-    let results = [];
-    if (!query.includes(" ")) {
-        const singleResult = await Post.find({ keywords: String(query) }).limit(
-            20
-        );
-        results = singleResult;
-    } else {
-        const splitQuery = query.split(" ");
-        const firstResult = await Post.find({
-            keywords: String(splitQuery[0]),
-        }).limit(20);
-        const secondResult = await Post.find({
-            keywords: String(splitQuery[1]),
-        }).limit(20);
-        results = [...firstResult, ...secondResult];
-    }
+    const query = req.params.query.toLowerCase();
+    const matchingResults = await Post.find({ keywords: String(query) }).limit(
+        20
+    );
+    const matchingPosts = matchingResults.map((post) => {
+        return {
+            _id: post._id,
+            title: post.title,
+            previewText: post.previewText,
+            postType: post.postType,
+        };
+    });
     res.status(200);
-    res.json(results);
+    res.json(matchingPosts);
 });
 
 const getHomePosts = wrapper(async (req, res) => {
@@ -343,11 +343,16 @@ const editPost = wrapper(async (req, res) => {
             },
         }
     );
+    const preview =
+        newPostContent.length < 50
+            ? newPostContent
+            : `${newPostContent.substring(0, 50)}...`;
     await Post.findOneAndUpdate(
         { _id: String(postId) },
         {
             $set: {
                 content: String(newPostContent),
+                previewText: String(preview),
                 hasBeenEdited: true,
                 lastEditedAt: String(currentDate),
                 history: [...prevPostHistory, prevPostVersion],

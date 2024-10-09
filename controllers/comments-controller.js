@@ -242,11 +242,16 @@ const editComment = wrapper(async (req, res) => {
         editNumber: dbComment.history.length + 1,
     };
     const prevHistory = dbComment.history || [];
+    const preview =
+        newContent.length <= 50
+            ? newContent
+            : `${newContent.substring(0, 50)}...`;
     await Comment.findOneAndUpdate(
         { _id: dbComment._id },
         {
             $set: {
                 content: newContent,
+                previewText: String(preview),
                 hasBeenEdited: true,
                 lastEditedAt: String(currentDate),
                 history: [...prevHistory, prevComment],
@@ -257,7 +262,7 @@ const editComment = wrapper(async (req, res) => {
         if (String(comment.commentId) === commentId) {
             return {
                 commentId: comment.commentId,
-                content: newContent,
+                previewText: String(preview),
                 relatedPost: comment.relatedPost,
             };
         } else {
