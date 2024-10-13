@@ -56,7 +56,8 @@ const createNewUser = wrapper(async (req, res) => {
         typeof req.body.username !== "string" ||
         typeof req.body.password !== "string" ||
         !passwordReg.test(req.body.password) ||
-        !usernameReg.test(req.body.username)
+        !usernameReg.test(req.body.username) ||
+        req.body.password.length > 40
     ) {
         throw new Error(
             "Bad Request Error: Username or password not in proper format"
