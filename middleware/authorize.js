@@ -4,21 +4,36 @@ import { User } from "../models/user-model.js";
 
 async function authorizeUser(req, res, next) {
     try {
-        if (!req.headers.authorization) {
+        const authReg = new RegExp("^[a-zA-Z0-9 ._-]+$");
+        const authHeader = req.headers.authorization;
+        const headerId = req.headers.user_id;
+        if (
+            !authHeader ||
+            typeof authHeader !== "string" ||
+            !authReg.test(authHeader)
+        ) {
             throw new Error(
-                "Authorization Error: No authorization header present"
+                "Authorization Error: Authorization header not present or not in correct format"
             );
         }
-        const authHeader = req.headers.authorization.split(" ");
-        if (authHeader[0] !== "Bearer") {
+        if (
+            !headerId ||
+            typeof headerId !== "string" ||
+            !authReg.test(headerId)
+        ) {
+            throw new Error(
+                "Authorization Error: User_id header not present or not in correct format"
+            );
+        }
+        const authArray = authHeader.split(" ");
+        if (authArray[0] !== "Bearer") {
             throw new Error(
                 "Authorization Error: Does not match required scheme"
             );
         }
-        const token = authHeader[1];
+        const token = authArray[1];
         const decodedClient = jwt.verify(token, process.env.JWT_SECRET);
         const id = decodedClient.id;
-        const headerId = req.headers.user_id;
         const dbUser = await User.findOne({ _id: id });
         if (!dbUser) {
             throw new Error(

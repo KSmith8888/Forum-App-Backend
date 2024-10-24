@@ -114,7 +114,7 @@ const getPostsByTopic = wrapper(async (req, res) => {
     }).limit(20);
     const topicPosts = topicResults.map((post) => {
         return {
-            _id: post._id,
+            postId: post._id,
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
@@ -144,7 +144,7 @@ const getPostsByQuery = wrapper(async (req, res) => {
     );
     const matchingPosts = matchingResults.map((post) => {
         return {
-            _id: post._id,
+            postId: post._id,
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
@@ -170,7 +170,7 @@ const getHomePosts = wrapper(async (req, res) => {
     const popularTen = popularFull.slice(0, 10);
     const popularPosts = popularTen.map((post) => {
         return {
-            _id: post._id,
+            postId: post._id,
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
@@ -181,7 +181,7 @@ const getHomePosts = wrapper(async (req, res) => {
         .limit(10);
     const newPosts = newFull.map((post) => {
         return {
-            _id: post._id,
+            postId: post._id,
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,

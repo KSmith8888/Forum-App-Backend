@@ -43,7 +43,7 @@ const wrapper = (fn) => {
             } else {
                 res.status(500);
                 res.json({
-                    message: "There has been an error, please try again later",
+                    message: "Please try again later",
                 });
             }
         }
