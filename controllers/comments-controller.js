@@ -75,7 +75,7 @@ const createComment = wrapper(async (req, res) => {
     const newNotificationData = {
         message: `${dbUser.displayName} replied to your message`,
         type: "Reply",
-        replyMessageId: String(postId),
+        relatedPostId: String(postId),
         commentId: String(dbComment._id),
     };
     if (!isCommentReply && relatedPost.user !== "Deleted") {

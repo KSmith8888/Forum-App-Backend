@@ -11,7 +11,7 @@ const notificationSchema = new Schema(
             type: String,
             required: true,
         },
-        replyMessageId: {
+        relatedPostId: {
             type: String,
             required: true,
             default: "none",

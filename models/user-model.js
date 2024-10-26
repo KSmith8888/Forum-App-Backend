@@ -46,6 +46,11 @@ const userSchema = new Schema({
         type: [
             {
                 title: { type: String, required: true },
+                previewText: {
+                    type: String,
+                    required: true,
+                    default: "No Preview",
+                },
                 postId: { type: String, required: true },
                 _id: false,
             },

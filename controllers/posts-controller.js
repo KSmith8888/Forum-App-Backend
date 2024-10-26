@@ -78,7 +78,11 @@ const createPost = wrapper(async (req, res) => {
         {
             $set: {
                 posts: [
-                    { postId: String(dbPost._id), title: dbPost.title },
+                    {
+                        postId: String(dbPost._id),
+                        title: dbPost.title,
+                        previewText: dbPost.previewText,
+                    },
                     ...dbUser.posts,
                 ],
             },
@@ -226,15 +230,16 @@ const likePost = wrapper(async (req, res) => {
     );
     if (
         didUserLike &&
-        (dbPost.likes === 5 || dbPost.likes === 10 || dbPost.likes === 25)
+        (numberOfLikes === 5 || numberOfLikes === 10 || numberOfLikes === 25)
     ) {
         const postCreatorUsername = dbPost.user.toLowerCase();
         const dbPostCreator = await User.findOne({
             username: postCreatorUsername,
         });
         const newNotification = await Notification.create({
-            message: `Your post, ${dbPost.title}, has ${dbPost.likes} likes`,
+            message: `Your post has ${numberOfLikes} likes`,
             type: "Achievement",
+            relatedPostId: String(dbPost._id),
         });
         await User.findOneAndUpdate(
             { username: postCreatorUsername },
@@ -328,9 +333,17 @@ const editPost = wrapper(async (req, res) => {
         timestamp: prevTimestamp,
         editNumber: dbPost.history.length + 1,
     };
+    const preview =
+        newPostContent.length < 50
+            ? newPostContent
+            : `${newPostContent.substring(0, 50)}...`;
     const newUserPosts = dbUser.posts.map((postObj) => {
         if (String(postObj.postId) === postId) {
-            return { title: dbPost.title, postId: postId };
+            return {
+                title: dbPost.title,
+                previewText: preview,
+                postId: postId,
+            };
         } else {
             return postObj;
         }
@@ -343,10 +356,6 @@ const editPost = wrapper(async (req, res) => {
             },
         }
     );
-    const preview =
-        newPostContent.length < 50
-            ? newPostContent
-            : `${newPostContent.substring(0, 50)}...`;
     await Post.findOneAndUpdate(
         { _id: String(postId) },
         {
