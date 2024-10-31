@@ -31,6 +31,7 @@ usersRouter.patch(
     "/profile/:id/image",
     sanitizeChars,
     authorizeUser,
+    checkIfBanned,
     updateProfilePic
 );
 usersRouter.patch(

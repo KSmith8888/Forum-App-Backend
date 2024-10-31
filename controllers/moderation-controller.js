@@ -78,15 +78,22 @@ const banUser = wrapper(async (req, res) => {
     if (dbUser.role === "admin") {
         throw new Error("Bad Request Error: Not possible to ban an admin");
     }
-    if (!bannedUser || !banTimestamp) {
+    if (!bannedUser || !banTimestamp || typeof banTimestamp !== "number") {
         throw new Error("Bad Request Error: Ban info not provided");
     }
+    const banEndDate = new Date(banTimestamp).toISOString();
+    const banString = banEndDate.slice(0, 10);
+    const banNotification = await Notification.create({
+        message: `Your account has been banned until ${banString}. During the ban, account actions are restricted`,
+        type: "Notice",
+    });
     await User.findOneAndUpdate(
         { username: String(username) },
         {
             $set: {
                 isBanned: true,
                 endOfBan: banTimestamp,
+                notifications: [...dbUser.notifications, banNotification._id],
             },
         }
     );
