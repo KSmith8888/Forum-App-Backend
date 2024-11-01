@@ -30,10 +30,10 @@ postsRouter.post(
 postsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likePost);
 postsRouter.patch("/save/:id", sanitizeChars, authorizeUser, savePost);
 postsRouter.get("/home", getHomePosts);
-postsRouter.get("/:topic", sanitizeChars, getPostsByTopic);
-postsRouter.get("/details/:id", sanitizeChars, getPost);
-postsRouter.get("/user/:id", sanitizeChars, getPostsByUser);
+postsRouter.get("/topics/:topic", sanitizeChars, getPostsByTopic);
 postsRouter.get("/search/:query", sanitizeChars, getPostsByQuery);
+postsRouter.get("/user/:id", sanitizeChars, getPostsByUser);
+postsRouter.get("/:id/:title", sanitizeChars, getPost);
 postsRouter.patch(
     "/details/:id",
     sanitizeChars,
