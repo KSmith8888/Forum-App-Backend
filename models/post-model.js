@@ -17,6 +17,13 @@ const postSchema = new Schema(
             minlength: 12,
             maxlength: 900,
         },
+        urlTitle: {
+            type: String,
+            required: true,
+            minlength: 9,
+            maxlength: 30,
+            default: "url_title",
+        },
         previewText: {
             type: String,
             required: true,

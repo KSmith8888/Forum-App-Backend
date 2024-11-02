@@ -51,6 +51,11 @@ const userSchema = new Schema({
                     required: true,
                     default: "No Preview",
                 },
+                urlTitle: {
+                    type: String,
+                    required: true,
+                    default: "url_title",
+                },
                 postId: { type: String, required: true },
                 _id: false,
             },
@@ -80,6 +85,11 @@ const userSchema = new Schema({
             {
                 title: { type: String, required: true },
                 postId: { type: String, required: true },
+                urlTitle: {
+                    type: String,
+                    required: true,
+                    default: "url_title",
+                },
                 _id: false,
             },
         ],

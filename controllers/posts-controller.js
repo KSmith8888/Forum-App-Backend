@@ -16,7 +16,8 @@ const createPost = wrapper(async (req, res) => {
         !title ||
         !content ||
         !postType ||
-        typeof content !== "string"
+        typeof content !== "string" ||
+        typeof title !== "string"
     ) {
         throw new Error(
             "Bad Request Error: Topic, title or content not provided"
@@ -58,12 +59,25 @@ const createPost = wrapper(async (req, res) => {
     if (postType === "Link" && content.length > 200) {
         throw new Error("Bad Request Error: Link content limit exceeded");
     }
+    const titleReg = new RegExp("^[a-zA-Z0-9_]+$");
+    let fullUrlTitle = "";
+    const titleChars = title.split("");
+    titleChars.forEach((char) => {
+        if (char === " ") {
+            fullUrlTitle += "_";
+        } else if (titleReg.test(char)) {
+            fullUrlTitle += char;
+        }
+    });
+    const urlTitle =
+        fullUrlTitle.length > 8 ? fullUrlTitle.slice(0, 30) : "url_title";
     const preview =
         content.length < 50 ? content : `${content.substring(0, 50)}...`;
     const dbPost = await Post.create({
         title: String(title),
         postType: String(postType),
         content: String(content),
+        urlTitle: String(urlTitle),
         previewText: String(preview),
         isPinned,
         topic: String(topic),
@@ -82,6 +96,7 @@ const createPost = wrapper(async (req, res) => {
                         postId: String(dbPost._id),
                         title: dbPost.title,
                         previewText: dbPost.previewText,
+                        urlTitle: dbPost.urlTitle,
                     },
                     ...dbUser.posts,
                 ],
@@ -122,6 +137,7 @@ const getPostsByTopic = wrapper(async (req, res) => {
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
+            urlTitle: post.urlTitle,
         };
     });
     res.status(200);
@@ -152,6 +168,7 @@ const getPostsByQuery = wrapper(async (req, res) => {
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
+            urlTitle: post.urlTitle,
         };
     });
     res.status(200);
@@ -178,6 +195,7 @@ const getHomePosts = wrapper(async (req, res) => {
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
+            urlTitle: post.urlTitle,
         };
     });
     const newFull = await Post.find({ user: { $ne: "Deleted" } })
@@ -189,6 +207,7 @@ const getHomePosts = wrapper(async (req, res) => {
             title: post.title,
             previewText: post.previewText,
             postType: post.postType,
+            urlTitle: post.urlTitle,
         };
     });
     res.status(200);
@@ -265,6 +284,7 @@ const likePost = wrapper(async (req, res) => {
 const savePost = wrapper(async (req, res) => {
     const postId = req.params.id;
     const postTitle = req.body.postTitle;
+    const postUrlTitle = req.body.urlTitle;
     const dbUser = await User.findOne({ _id: String(req.userId) });
     //Did user save post or unsave
     let didUserSave = true;
@@ -278,7 +298,7 @@ const savePost = wrapper(async (req, res) => {
     });
     if (didUserSave) {
         newSavedPosts = [
-            { postId: postId, title: postTitle },
+            { postId: postId, title: postTitle, urlTitle: postUrlTitle },
             ...newSavedPosts,
         ];
     }

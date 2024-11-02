@@ -16,6 +16,11 @@ const notificationSchema = new Schema(
             required: true,
             default: "none",
         },
+        postUrlTitle: {
+            type: String,
+            required: true,
+            default: "url_title",
+        },
         commentId: {
             type: String,
             required: true,
