@@ -69,6 +69,11 @@ const userSchema = new Schema({
                 commentId: { type: String, required: true },
                 previewText: { type: String, required: true },
                 relatedPost: { type: String, required: true },
+                postUrlTitle: {
+                    type: String,
+                    required: true,
+                    default: "url_title",
+                },
                 _id: false,
             },
         ],

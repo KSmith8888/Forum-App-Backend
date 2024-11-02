@@ -7,6 +7,11 @@ const reportSchema = new Schema(
             type: String,
             required: true,
         },
+        postUrlTitle: {
+            type: String,
+            required: true,
+            default: "url_title",
+        },
         messageType: {
             type: String,
             required: true,
