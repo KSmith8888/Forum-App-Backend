@@ -21,26 +21,26 @@ const postsRouter = express.Router();
 
 postsRouter.options("*", optionsPreflight);
 postsRouter.get("/home/", getHomePosts);
-postsRouter.get("/topics/:topic/", sanitizeChars, getPostsByTopic);
-postsRouter.get("/search/:query/", sanitizeChars, getPostsByQuery);
-postsRouter.get("/user/:id/", sanitizeChars, getPostsByUser);
-postsRouter.get("/:id/:title/", sanitizeChars, getPost);
+postsRouter.get("/topics/:topic", sanitizeChars, getPostsByTopic);
+postsRouter.get("/search/:query", sanitizeChars, getPostsByQuery);
+postsRouter.get("/user/:id", sanitizeChars, getPostsByUser);
+postsRouter.get("/:id", sanitizeChars, getPost);
 postsRouter.post(
-    "/create/",
+    "/create",
     sanitizeChars,
     authorizeUser,
     checkIfBanned,
     createPost
 );
-postsRouter.patch("/likes/:id/", sanitizeChars, authorizeUser, likePost);
-postsRouter.patch("/save/:id/", sanitizeChars, authorizeUser, savePost);
+postsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likePost);
+postsRouter.patch("/save/:id", sanitizeChars, authorizeUser, savePost);
 postsRouter.patch(
-    "/:id/",
+    "/:id",
     sanitizeChars,
     authorizeUser,
     checkIfBanned,
     editPost
 );
-postsRouter.delete("/:id/", sanitizeChars, authorizeUser, deletePost);
+postsRouter.delete("/:id", sanitizeChars, authorizeUser, deletePost);
 
 export { postsRouter };

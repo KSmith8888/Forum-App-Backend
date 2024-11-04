@@ -11,16 +11,17 @@ const createPost = wrapper(async (req, res) => {
     const postType = req.body.postType;
     const isPinned = req.body.isPinned === "pinned" ? true : false;
     const keywordString = req.body.keywords;
+    const strictReg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%-]+$");
     if (
         !topic ||
         !title ||
         !content ||
         !postType ||
         typeof content !== "string" ||
-        typeof title !== "string"
+        !strictReg.test(title)
     ) {
         throw new Error(
-            "Bad Request Error: Topic, title or content not provided"
+            "Bad Request Error: Post info not provided or not in correct format"
         );
     }
     if (isPinned && req.role !== "admin") {
@@ -70,7 +71,9 @@ const createPost = wrapper(async (req, res) => {
         }
     });
     const urlTitle =
-        fullUrlTitle.length > 8 ? fullUrlTitle.slice(0, 30) : "url_title";
+        fullUrlTitle.length > 8
+            ? fullUrlTitle.slice(0, 30).toLowerCase()
+            : `${topic}_post`;
     const preview =
         content.length < 50 ? content : `${content.substring(0, 50)}...`;
     const dbPost = await Post.create({
