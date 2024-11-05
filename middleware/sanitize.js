@@ -23,28 +23,6 @@ function sanitizeChars(req, res, next) {
                 ) {
                     throw new Error("Value includes invalid scheme");
                 }
-                if (value.includes("https://")) {
-                    const attemptedLinks = [];
-                    const contentWords = value.split(" ");
-                    const reg = new RegExp("^[a-zA-Z0-9.:/_-]+$");
-                    contentWords.forEach((word) => {
-                        if (word.startsWith("https://")) {
-                            attemptedLinks.push(word);
-                        }
-                    });
-                    attemptedLinks.forEach((link) => {
-                        const isValid = URL.canParse(link);
-                        if (
-                            !isValid ||
-                            !reg.test(link) ||
-                            !link.includes(".")
-                        ) {
-                            throw new Error(
-                                "Bad Request Error: Invalid link content provided"
-                            );
-                        }
-                    });
-                }
             } else {
                 if (!reg.test(value)) {
                     throw new Error("User input not valid: Number input");

@@ -32,6 +32,18 @@ const createPost = wrapper(async (req, res) => {
     if (postType !== "Text" && postType !== "Link") {
         throw new Error("Bad Request Error: Post type is not valid");
     }
+    if (postType === "Link") {
+        const linkReg = new RegExp("^[a-zA-Z0-9?&=@.:/_-]+$");
+        const isValid = URL.canParse(content);
+        if (
+            !content.startsWith("https://") ||
+            !isValid ||
+            !linkReg.test(content) ||
+            !content.includes(".")
+        ) {
+            throw new Error("Bad Request Error: Invalid link provided");
+        }
+    }
     if (keywordString && typeof keywordString !== "string") {
         throw new Error("Bad Request Error: Invalid keywords provided");
     }
