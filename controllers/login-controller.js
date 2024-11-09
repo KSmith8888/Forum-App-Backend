@@ -18,18 +18,47 @@ const attemptLogin = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Invalid credential type provided");
     }
     const dbUser = await User.findOne({
-        username: attemptUsername.toLowerCase(),
+        username: String(attemptUsername.toLowerCase()),
     });
     if (!dbUser) {
         throw new Error(
             "Credential Error: No user found with credentials provided"
         );
     }
+    const current = Date.now();
+    if (dbUser.loginAttempts >= 3) {
+        if (current < dbUser.frozenUntil) {
+            throw new Error(
+                "Bad Request Error: Attempted access during account freeze"
+            );
+        } else {
+            await User.findOneAndUpdate(
+                { _id: String(dbUser._id) },
+                {
+                    $set: {
+                        loginAttempts: 0,
+                        frozenUntil: 0,
+                    },
+                }
+            );
+        }
+    }
     const hashedPassword = await bcrypt.compare(
         attemptPassword,
         dbUser.password
     );
     if (!hashedPassword) {
+        const newAttempts = dbUser.loginAttempts + 1;
+        const freezeTime = newAttempts >= 3 ? current + 600000 : 0;
+        await User.findOneAndUpdate(
+            { _id: String(dbUser._id) },
+            {
+                $set: {
+                    loginAttempts: newAttempts,
+                    frozenUntil: freezeTime,
+                },
+            }
+        );
         throw new Error(
             "Credential Error: Provided password does not match stored hash"
         );

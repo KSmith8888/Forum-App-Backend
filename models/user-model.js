@@ -27,6 +27,16 @@ const userSchema = new Schema({
         maxlength: 18,
         unique: true,
     },
+    loginAttempts: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
+    frozenUntil: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
     isBanned: {
         type: Boolean,
         required: true,
@@ -49,12 +59,10 @@ const userSchema = new Schema({
                 previewText: {
                     type: String,
                     required: true,
-                    default: "No Preview",
                 },
                 urlTitle: {
                     type: String,
                     required: true,
-                    default: "url_title",
                 },
                 postId: { type: String, required: true },
                 _id: false,
@@ -72,7 +80,6 @@ const userSchema = new Schema({
                 postUrlTitle: {
                     type: String,
                     required: true,
-                    default: "url_title",
                 },
                 _id: false,
             },
@@ -93,7 +100,6 @@ const userSchema = new Schema({
                 urlTitle: {
                     type: String,
                     required: true,
-                    default: "url_title",
                 },
                 _id: false,
             },
