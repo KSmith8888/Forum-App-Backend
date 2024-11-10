@@ -11,8 +11,8 @@ async function checkIfBanned(req, res, next) {
         if (dbUser.isBanned) {
             const currentTime = Date.now();
             const banDiff = dbUser.endOfBan - currentTime;
-            const banEndDate = new Date(dbUser.endOfBan).toISOString();
-            const banString = banEndDate.slice(0, 10);
+            const banEndDate = new Date(dbUser.endOfBan).toUTCString();
+            const banString = banEndDate.slice(0, 16);
             if (typeof banDiff !== "number") {
                 throw new Error("Ban Type Error: Ban time is not type number");
             }

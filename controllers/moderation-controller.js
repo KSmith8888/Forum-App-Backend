@@ -88,7 +88,6 @@ const banUser = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: Ban info not provided");
     }
     const banEndDate = new Date(banTimestamp).toUTCString();
-    console.log(banEndDate);
     const banString = banEndDate.slice(0, 16);
     const banNotification = await Notification.create({
         message: `Your account has been banned until ${banString} for ${banReason}. During the ban, account actions are restricted`,
