@@ -24,6 +24,8 @@ const getOwnProfile = wrapper(async (req, res) => {
         bio: dbUser.profileBio,
         pswdLastUpdated: dbUser.pswdLastUpdated,
         replySetting: dbUser.getReplyNotifications,
+        email: dbUser.email,
+        verifiedEmail: dbUser.verifiedEmail,
     });
 });
 
@@ -45,7 +47,12 @@ const getUserProfile = wrapper(async (req, res) => {
 });
 
 const createNewUser = wrapper(async (req, res) => {
-    if (!req.body.username || !req.body.password || !req.body.terms) {
+    if (
+        !req.body.username ||
+        !req.body.password ||
+        !req.body.terms ||
+        !req.body.email
+    ) {
         throw new Error(
             "Bad Request Error: Registration info was not provided"
         );
@@ -55,8 +62,10 @@ const createNewUser = wrapper(async (req, res) => {
     if (
         typeof req.body.username !== "string" ||
         typeof req.body.password !== "string" ||
+        typeof req.body.email !== "string" ||
         !passwordReg.test(req.body.password) ||
         !usernameReg.test(req.body.username) ||
+        !passwordReg.test(req.body.email) ||
         req.body.password.length > 40
     ) {
         throw new Error(
@@ -78,11 +87,14 @@ const createNewUser = wrapper(async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
+    const userEmail =
+        req.body.email === "none" ? "4em@example.com" : req.body.email;
     const currentDate = new Date().toDateString();
     await User.create({
         username: String(username),
         password: String(hashedPassword),
         displayName: String(displayName),
+        email: String(userEmail),
         pswdLastUpdated: `Last updated - ${currentDate}`,
     });
     res.status(201);

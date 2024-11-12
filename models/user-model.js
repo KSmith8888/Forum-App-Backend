@@ -15,6 +15,17 @@ const userSchema = new Schema({
         minlength: 60,
         maxlength: 60,
     },
+    email: {
+        type: String,
+        minlength: 6,
+        maxlength: 40,
+        default: "4em@example.com",
+    },
+    verifiedEmail: {
+        type: Boolean,
+        required: true,
+        default: false,
+    },
     role: {
         type: String,
         required: true,
