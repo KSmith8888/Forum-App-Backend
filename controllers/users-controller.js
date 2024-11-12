@@ -89,6 +89,14 @@ const createNewUser = wrapper(async (req, res) => {
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
     const userEmail =
         req.body.email === "none" ? "4em@example.com" : req.body.email;
+    if (userEmail !== "4em@example.com") {
+        const requestedEmail = await User.findOne({
+            email: String(userEmail),
+        });
+        if (requestedEmail?.email) {
+            throw new Error("Email unavailable Error: Duplicate entry");
+        }
+    }
     const currentDate = new Date().toDateString();
     await User.create({
         username: String(username),
@@ -185,6 +193,38 @@ const updatePassword = wrapper(async (req, res) => {
     res.status(200);
     res.json({
         message: `Password updated successfully-Target ID-${Date.now()}`,
+    });
+});
+
+const updateEmail = wrapper(async (req, res) => {
+    const userId = req.userId;
+    const newEmail = req.body.email;
+    if (!newEmail || typeof req.body.email !== "string") {
+        throw new Error("Bad Request Error: New email was not provided");
+    }
+    const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
+    if (!reg.test(newEmail) || !newEmail.includes("@")) {
+        throw new Error("Bad Request Error: Invalid email provided");
+    }
+    const requestedEmail = await User.findOne({
+        email: String(newEmail),
+    });
+    if (requestedEmail?.email) {
+        throw new Error("Email unavailable Error: Duplicate entry");
+    }
+    await User.findOneAndUpdate(
+        { _id: String(userId) },
+        {
+            $set: {
+                email: String(newEmail),
+                verifiedEmail: false,
+            },
+        }
+    );
+
+    res.status(200);
+    res.json({
+        message: `Email updated successfully-Target ID-${Date.now()}`,
     });
 });
 
@@ -291,6 +331,7 @@ export {
     updateProfilePic,
     updateProfileBio,
     updatePassword,
+    updateEmail,
     updateNotificationSetting,
     deleteOwnAccount,
     deleteNotification,

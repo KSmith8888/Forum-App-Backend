@@ -8,6 +8,7 @@ import {
     updateProfilePic,
     updateProfileBio,
     updatePassword,
+    updateEmail,
     updateNotificationSetting,
     deleteOwnAccount,
     deleteNotification,
@@ -46,6 +47,12 @@ usersRouter.patch(
     sanitizeChars,
     authorizeUser,
     updatePassword
+);
+usersRouter.patch(
+    "/profile/:id/email",
+    sanitizeChars,
+    authorizeUser,
+    updateEmail
 );
 usersRouter.patch(
     "/profile/:id/notifications",
