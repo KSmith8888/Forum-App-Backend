@@ -41,6 +41,12 @@ const wrapper = (fn) => {
                     message:
                         "Sorry, that email is already associated with another account",
                 });
+            } else if (err.message.startsWith("Email Not Verified Error:")) {
+                res.status(403);
+                res.json({
+                    message:
+                        "You must verify this email address before attempting a password reset",
+                });
             } else if (err.message.startsWith("Limit Exceeded Error:")) {
                 res.status(429);
                 res.json({

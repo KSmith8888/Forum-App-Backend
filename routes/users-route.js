@@ -5,6 +5,7 @@ import {
     getOwnProfile,
     getUserProfile,
     createNewUser,
+    resetPassword,
     updateProfilePic,
     updateProfileBio,
     updatePassword,
@@ -28,6 +29,7 @@ usersRouter.get(
     getOwnProfile
 );
 usersRouter.post("/", sanitizeChars, createNewUser);
+usersRouter.post("/reset", sanitizeChars, resetPassword);
 usersRouter.patch(
     "/profile/:id/image",
     sanitizeChars,

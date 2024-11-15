@@ -97,6 +97,11 @@ const createNewUser = wrapper(async (req, res) => {
             throw new Error("Email unavailable Error: Duplicate entry");
         }
     }
+    const newNotification = await Notification.create({
+        message:
+            "Welcome to 4em, your account is now active. If you provided an email address, please follow the instructions in the verification email that was sent so you can use if for password resets if needed.",
+        type: "Notice",
+    });
     const currentDate = new Date().toDateString();
     await User.create({
         username: String(username),
@@ -104,10 +109,44 @@ const createNewUser = wrapper(async (req, res) => {
         displayName: String(displayName),
         email: String(userEmail),
         pswdLastUpdated: `Last updated - ${currentDate}`,
+        notifications: [newNotification._id],
     });
     res.status(201);
     res.json({
         message: "New account created successfully",
+    });
+});
+
+const resetPassword = wrapper(async (req, res) => {
+    const username = req.body.username;
+    const email = req.body.email;
+    if (
+        !username ||
+        !email ||
+        typeof username !== "string" ||
+        typeof email !== "string"
+    ) {
+        throw new Error(
+            "Bad Request Error: Username or email was not provided"
+        );
+    }
+    const dbUser = await User.findOne({
+        username: String(username.toLowerCase()),
+    });
+    if (!dbUser) {
+        throw new Error("Not Found Error: No user found with that username");
+    }
+    if (dbUser.email === "4em@example.com" || dbUser.email !== email) {
+        throw new Error(
+            "Credential Error: Provided email does not match user email"
+        );
+    }
+    if (!dbUser.verifiedEmail) {
+        throw new Error("Email Not Verified Error: User email is not verified");
+    }
+    res.status(200);
+    res.json({
+        message: "Password reset successfully",
     });
 });
 
@@ -328,6 +367,7 @@ export {
     getOwnProfile,
     getUserProfile,
     createNewUser,
+    resetPassword,
     updateProfilePic,
     updateProfileBio,
     updatePassword,
