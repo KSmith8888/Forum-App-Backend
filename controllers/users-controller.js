@@ -58,19 +58,25 @@ const createNewUser = wrapper(async (req, res) => {
         );
     }
     const usernameReg = new RegExp("^[a-zA-Z0-9_]+$");
-    const passwordReg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
+    const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
     if (
         typeof req.body.username !== "string" ||
         typeof req.body.password !== "string" ||
-        typeof req.body.email !== "string" ||
-        !passwordReg.test(req.body.password) ||
+        !reg.test(req.body.password) ||
         !usernameReg.test(req.body.username) ||
-        !passwordReg.test(req.body.email) ||
         req.body.password.length > 40
     ) {
         throw new Error(
             "Bad Request Error: Username or password not in proper format"
         );
+    }
+    if (
+        typeof req.body.email !== "string" ||
+        !reg.test(req.body.email) ||
+        !req.body.email.includes("@") ||
+        !req.body.email.includes(".")
+    ) {
+        throw new Error("Bad Request Error: Email not in proper format");
     }
     const bannedNames = ["deleted", "admin", "mod"];
     const displayName = req.body.username;
@@ -87,15 +93,12 @@ const createNewUser = wrapper(async (req, res) => {
     }
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
-    const userEmail =
-        req.body.email === "none" ? "4em@example.com" : req.body.email;
-    if (userEmail !== "4em@example.com") {
-        const requestedEmail = await User.findOne({
-            email: String(userEmail),
-        });
-        if (requestedEmail?.email) {
-            throw new Error("Email unavailable Error: Duplicate entry");
-        }
+    const userEmail = req.body.email;
+    const requestedEmail = await User.findOne({
+        email: String(userEmail),
+    });
+    if (requestedEmail?.email) {
+        throw new Error("Email unavailable Error: Duplicate entry");
     }
     const newNotification = await Notification.create({
         message:
@@ -134,7 +137,7 @@ const resetPassword = wrapper(async (req, res) => {
         username: String(username.toLowerCase()),
     });
     if (!dbUser) {
-        throw new Error("Not Found Error: No user found with that username");
+        throw new Error("Credential Error: No user found with that username");
     }
     if (dbUser.email === "4em@example.com" || dbUser.email !== email) {
         throw new Error(
@@ -242,7 +245,11 @@ const updateEmail = wrapper(async (req, res) => {
         throw new Error("Bad Request Error: New email was not provided");
     }
     const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
-    if (!reg.test(newEmail) || !newEmail.includes("@")) {
+    if (
+        !reg.test(newEmail) ||
+        !newEmail.includes("@") ||
+        !newEmail.includes(".")
+    ) {
         throw new Error("Bad Request Error: Invalid email provided");
     }
     const requestedEmail = await User.findOne({
