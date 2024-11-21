@@ -1,4 +1,5 @@
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
 
 import { User } from "../models/user-model.js";
 import { Post } from "../models/post-model.js";
@@ -241,7 +242,7 @@ const updatePassword = wrapper(async (req, res) => {
 const updateEmail = wrapper(async (req, res) => {
     const userId = req.userId;
     const newEmail = req.body.email;
-    if (!newEmail || typeof req.body.email !== "string") {
+    if (!newEmail || typeof newEmail !== "string") {
         throw new Error("Bad Request Error: New email was not provided");
     }
     const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
@@ -252,12 +253,42 @@ const updateEmail = wrapper(async (req, res) => {
     ) {
         throw new Error("Bad Request Error: Invalid email provided");
     }
+    /*
     const requestedEmail = await User.findOne({
         email: String(newEmail),
     });
     if (requestedEmail?.email) {
         throw new Error("Email unavailable Error: Duplicate entry");
     }
+    */
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+    const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
+    transporter
+        .sendMail({
+            to: String(newEmail),
+            subject: "Verify this address to update your account email",
+            html: `
+        <p>Use the code below to verify this email address</p>
+        <p>Verification code: ${code}</p>
+        <p>This code will expire if not used within 10 minutes</p>
+        `,
+        })
+        .then(() => {
+            console.log("Email sent");
+        })
+        .catch((err) => {
+            if (err instanceof Error) {
+                console.log(err.message);
+            }
+        });
     await User.findOneAndUpdate(
         { _id: String(userId) },
         {
