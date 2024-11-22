@@ -35,12 +35,6 @@ const wrapper = (fn) => {
                     message:
                         "Sorry, that username is not available. Please choose a different username",
                 });
-            } else if (err.message.startsWith("Email unavailable Error:")) {
-                res.status(400);
-                res.json({
-                    message:
-                        "Sorry, that email is already associated with another account",
-                });
             } else if (err.message.startsWith("Email Not Verified Error:")) {
                 res.status(403);
                 res.json({

@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 
 import { User } from "../models/user-model.js";
+import { PendingUser } from "../models/pending-user-model.js";
 import { Post } from "../models/post-model.js";
 import { Comment } from "../models/comment-model.js";
 import { wrapper } from "./wrapper.js";
@@ -95,23 +96,72 @@ const createNewUser = wrapper(async (req, res) => {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(String(password), saltRounds);
     const userEmail = req.body.email;
+    /*
     const requestedEmail = await User.findOne({
         email: String(userEmail),
     });
     if (requestedEmail?.email) {
         throw new Error("Email unavailable Error: Duplicate entry");
     }
-    const newNotification = await Notification.create({
-        message:
-            "Welcome to 4em, your account is now active. If you provided an email address, please follow the instructions in the verification email that was sent so you can use if for password resets if needed.",
-        type: "Notice",
+        */
+    const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
     });
-    const currentDate = new Date().toDateString();
-    await User.create({
+    await transporter.sendMail({
+        to: String(userEmail),
+        subject: "Verify to complete 4em account registration",
+        html: `
+        <p>Use the code below to finish creating your 4em account</p>
+        <p>Verification code: ${code}</p>
+        <p>This code will expire if not used within 10 minutes</p>
+        `,
+    });
+    const expiration = Date.now() + 600000;
+    const dbPending = await PendingUser.create({
         username: String(username),
         password: String(hashedPassword),
         displayName: String(displayName),
         email: String(userEmail),
+        verificationCode: code,
+        codeExpiration: expiration,
+    });
+    res.status(201);
+    res.json({
+        message:
+            "New account is pending, email must be verified to complete registration",
+        pendingId: dbPending._id,
+    });
+});
+
+const registerUser = wrapper(async (req, res) => {
+    const code = req.body.code;
+    const pendingId = req.body.pendingId;
+    if (!code || !pendingId) {
+        throw new Error("Bad Request Error: Did not provide registration info");
+    }
+    const dbPending = await PendingUser.findOne({
+        _id: String(pendingId),
+    });
+    if (code !== String(dbPending.verificationCode)) {
+        throw new Error("Bad Request Error: Verification code does not match");
+    }
+    const newNotification = await Notification.create({
+        message: "Welcome to 4em, your account is now active.",
+        type: "Notice",
+    });
+    const currentDate = new Date().toDateString();
+    await User.create({
+        username: dbPending.username,
+        password: dbPending.password,
+        displayName: dbPending.displayName,
+        email: dbPending.email,
         pswdLastUpdated: `Last updated - ${currentDate}`,
         notifications: [newNotification._id],
     });
@@ -140,17 +190,26 @@ const resetPassword = wrapper(async (req, res) => {
     if (!dbUser) {
         throw new Error("Credential Error: No user found with that username");
     }
-    if (dbUser.email === "4em@example.com" || dbUser.email !== email) {
-        throw new Error(
-            "Credential Error: Provided email does not match user email"
-        );
-    }
-    if (!dbUser.verifiedEmail) {
-        throw new Error("Email Not Verified Error: User email is not verified");
-    }
+    const transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 465,
+        secure: true,
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+        },
+    });
+    await transporter.sendMail({
+        to: String(dbUser.email),
+        subject: "Account password reset notice - 4em",
+        html: `
+        <p>Reset your password by following the instructions below</p>
+        <p>This will be created later</p>
+        `,
+    });
     res.status(200);
     res.json({
-        message: "Password reset successfully",
+        message: "Password reset initiated successfully",
     });
 });
 
@@ -271,24 +330,15 @@ const updateEmail = wrapper(async (req, res) => {
         },
     });
     const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
-    transporter
-        .sendMail({
-            to: String(newEmail),
-            subject: "Verify this address to update your account email",
-            html: `
+    await transporter.sendMail({
+        to: String(newEmail),
+        subject: "Verify this address to update your account email",
+        html: `
         <p>Use the code below to verify this email address</p>
         <p>Verification code: ${code}</p>
         <p>This code will expire if not used within 10 minutes</p>
         `,
-        })
-        .then(() => {
-            console.log("Email sent");
-        })
-        .catch((err) => {
-            if (err instanceof Error) {
-                console.log(err.message);
-            }
-        });
+    });
     await User.findOneAndUpdate(
         { _id: String(userId) },
         {
@@ -405,6 +455,7 @@ export {
     getOwnProfile,
     getUserProfile,
     createNewUser,
+    registerUser,
     resetPassword,
     updateProfilePic,
     updateProfileBio,
