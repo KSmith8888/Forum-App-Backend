@@ -17,9 +17,13 @@ const attemptLogin = wrapper(async (req, res) => {
     ) {
         throw new Error("Bad Request Error: Invalid credential type provided");
     }
-    const dbUser = await User.findOne({
-        username: String(attemptUsername.toLowerCase()),
-    });
+    const dbUser = attemptUsername.includes("@")
+        ? await User.findOne({
+              email: String(attemptUsername),
+          })
+        : await User.findOne({
+              username: String(attemptUsername.toLowerCase()),
+          });
     if (!dbUser) {
         throw new Error(
             "Credential Error: No user found with credentials provided"

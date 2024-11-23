@@ -21,11 +21,6 @@ const userSchema = new Schema({
         minlength: 6,
         maxlength: 40,
     },
-    verifiedEmail: {
-        type: Boolean,
-        required: true,
-        default: false,
-    },
     role: {
         type: String,
         required: true,
@@ -62,6 +57,11 @@ const userSchema = new Schema({
         type: String,
         required: true,
         default: "Last updated at account creation",
+    },
+    resetExpiration: {
+        type: Number,
+        required: true,
+        default: 0,
     },
     posts: {
         type: [
