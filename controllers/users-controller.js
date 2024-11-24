@@ -148,7 +148,10 @@ const registerUser = wrapper(async (req, res) => {
     const dbPending = await PendingUser.findOne({
         _id: String(pendingId),
     });
-    if (code !== String(dbPending.verificationCode)) {
+    if (!dbPending) {
+        throw new Error("Bad Request Error: Verification info is not valid");
+    }
+    if (String(code) !== String(dbPending.verificationCode)) {
         throw new Error("Bad Request Error: Verification code does not match");
     }
     const current = Date.now();
@@ -202,16 +205,17 @@ const resetPassword = wrapper(async (req, res) => {
             pass: process.env.EMAIL_PASS,
         },
     });
+    const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
     const expiration = Date.now() + 600000;
     await User.findOneAndUpdate(
         { _id: dbUser._id },
         {
             $set: {
+                resetCode: code,
                 resetExpiration: expiration,
             },
         }
     );
-    const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
     await transporter.sendMail({
         to: String(dbUser.email),
         subject: "Reset your 4em account password",
@@ -227,6 +231,45 @@ const resetPassword = wrapper(async (req, res) => {
     res.json({
         message: "Password reset initiated successfully",
         userId: String(dbUser._id),
+    });
+});
+
+const completeReset = wrapper(async (req, res) => {
+    const code = req.body.code;
+    const userId = req.body.userId;
+    const newPassword = req.body.password;
+    const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
+    if (!code || !userId || !newPassword || !reg.test(newPassword)) {
+        throw new Error("Bad Request Error: Reset password info not provided");
+    }
+    const dbUser = await User.findOne({ _id: String(userId) });
+    if (!dbUser) {
+        throw new Error("Bad Request Error: Reset info is not valid");
+    }
+    if (String(code) !== String(dbUser.resetCode)) {
+        throw new Error("Bad Request Error: Reset code does not match");
+    }
+    const current = Date.now();
+    if (dbUser.resetExpiration < current) {
+        throw new Error("Bad Request Error: Reset code has expired");
+    }
+    const saltRounds = 10;
+    const newHash = await bcrypt.hash(String(newPassword), saltRounds);
+    const currentDate = new Date();
+    await User.findOneAndUpdate(
+        { _id: String(userId) },
+        {
+            $set: {
+                password: newHash,
+                pswdLastUpdated: `Last updated - ${currentDate.toDateString()}`,
+                resetCode: 0,
+                resetExpiration: 0,
+            },
+        }
+    );
+    res.status(200);
+    res.json({
+        message: "Password reset successfully",
     });
 });
 
@@ -472,6 +515,7 @@ export {
     createNewUser,
     registerUser,
     resetPassword,
+    completeReset,
     updateProfilePic,
     updateProfileBio,
     updatePassword,

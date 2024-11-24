@@ -58,6 +58,11 @@ const userSchema = new Schema({
         required: true,
         default: "Last updated at account creation",
     },
+    resetCode: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
     resetExpiration: {
         type: Number,
         required: true,
