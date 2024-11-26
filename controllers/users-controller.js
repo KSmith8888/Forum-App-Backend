@@ -361,7 +361,13 @@ const updatePassword = wrapper(async (req, res) => {
 const updateEmail = wrapper(async (req, res) => {
     const userId = req.userId;
     const newEmail = req.body.email;
-    if (!newEmail || typeof newEmail !== "string") {
+    const password = req.body.password;
+    if (
+        !newEmail ||
+        typeof newEmail !== "string" ||
+        !password ||
+        typeof password !== "string"
+    ) {
         throw new Error("Bad Request Error: New email was not provided");
     }
     const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
@@ -378,6 +384,12 @@ const updateEmail = wrapper(async (req, res) => {
     if (requestedEmail?.email) {
         throw new Error("Email unavailable Error: Duplicate entry");
     }
+    const dbUser = await User.findOne({ _id: String(userId) });
+    const hashedPassword = await bcrypt.compare(password, dbUser.password);
+    if (!hashedPassword) {
+        throw new Error("Credential Error: Password does not match");
+    }
+    /*
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -397,19 +409,11 @@ const updateEmail = wrapper(async (req, res) => {
         <p>This code will expire if not used within 10 minutes</p>
         `,
     });
-    await User.findOneAndUpdate(
-        { _id: String(userId) },
-        {
-            $set: {
-                email: String(newEmail),
-                verifiedEmail: false,
-            },
-        }
-    );
+    */
 
     res.status(200);
     res.json({
-        message: `Email updated successfully-Target ID-${Date.now()}`,
+        message: "Email update initiated successfully",
     });
 });
 
