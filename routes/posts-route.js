@@ -5,7 +5,6 @@ import {
     getPost,
     getHomePosts,
     getPostsByTopic,
-    getPostsByUser,
     likePost,
     savePost,
     getPostsByQuery,
@@ -23,7 +22,6 @@ postsRouter.options("*", optionsPreflight);
 postsRouter.get("/home/", getHomePosts);
 postsRouter.get("/topics/:topic", sanitizeChars, getPostsByTopic);
 postsRouter.get("/search/:query", sanitizeChars, getPostsByQuery);
-postsRouter.get("/user/:id", sanitizeChars, getPostsByUser);
 postsRouter.get("/:id", sanitizeChars, getPost);
 postsRouter.post(
     "/create",

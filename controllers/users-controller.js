@@ -117,8 +117,9 @@ const createNewUser = wrapper(async (req, res) => {
         subject: "Verify to complete 4em account registration",
         html: `
         <p>Hi ${String(displayName)},</p>
+        <br>
         <p>Use the code below to finish creating your 4em account</p>
-        <p>Verification code: ${code}</p>
+        <p>Verification code: <strong>${code}</strong></p>
         <p>This code will expire if not used within 10 minutes</p>
         `,
     });
@@ -221,7 +222,7 @@ const resetPassword = wrapper(async (req, res) => {
         subject: "Reset your 4em account password",
         html: `
         <p>Use the code below to reset your password</p>
-        <p>Verification code: ${code}</p>
+        <p>Verification code: <strong>${code}</strong></p>
         <p>This code will expire if not used within 10 minutes</p>
         <br>
         <p>If you did not request this, please contact the admins</p>
@@ -389,7 +390,9 @@ const updateEmail = wrapper(async (req, res) => {
     if (!hashedPassword) {
         throw new Error("Credential Error: Password does not match");
     }
-    /*
+    const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
+    const expiration = Date.now() + 600000;
+
     const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
         port: 465,
@@ -399,21 +402,61 @@ const updateEmail = wrapper(async (req, res) => {
             pass: process.env.EMAIL_PASS,
         },
     });
-    const code = Math.floor(Math.random() * (999999 - 100000) + 100000);
     await transporter.sendMail({
         to: String(newEmail),
         subject: "Verify this address to update your account email",
         html: `
         <p>Use the code below to verify this email address</p>
-        <p>Verification code: ${code}</p>
+        <p>Verification code: <strong>${code}</strong></p>
         <p>This code will expire if not used within 10 minutes</p>
         `,
     });
-    */
+
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                emailTemp: String(newEmail),
+                emailCode: code,
+                emailExpiration: expiration,
+            },
+        }
+    );
 
     res.status(200);
     res.json({
         message: "Email update initiated successfully",
+    });
+});
+
+const completeEmailUpdate = wrapper(async (req, res) => {
+    const userId = req.userId;
+    const code = req.body.code;
+    const dbUser = await User.findOne({ _id: String(userId) });
+    if (!code) {
+        throw new Error("Bad Request Error: Verification info not provided");
+    }
+    if (String(code) !== String(dbUser.emailCode)) {
+        throw new Error("Bad Request Error: Verification code does not match");
+    }
+    const current = Date.now();
+    if (dbUser.emailExpiration < current) {
+        throw new Error("Bad Request Error: Verification code has expired");
+    }
+    await User.findOneAndUpdate(
+        { _id: dbUser._id },
+        {
+            $set: {
+                email: dbUser.emailTemp,
+                emailTemp: "",
+                emailCode: 0,
+                emailExpiration: 0,
+            },
+        }
+    );
+    res.status(200);
+    res.json({
+        message: "Email updated successfully",
     });
 });
 
@@ -448,6 +491,7 @@ const deleteOwnAccount = wrapper(async (req, res) => {
                 postType: "Text",
                 title: "This post has been deleted",
                 content: "This post has been deleted",
+                urlTitle: "Deleted",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
@@ -524,6 +568,7 @@ export {
     updateProfileBio,
     updatePassword,
     updateEmail,
+    completeEmailUpdate,
     updateNotificationSetting,
     deleteOwnAccount,
     deleteNotification,

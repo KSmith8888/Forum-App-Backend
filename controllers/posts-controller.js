@@ -159,16 +159,6 @@ const getPostsByTopic = wrapper(async (req, res) => {
     res.json(topicPosts);
 });
 
-const getPostsByUser = wrapper(async (req, res) => {
-    const userId = req.params.id;
-    const dbUser = await User.findOne({ _id: String(userId) });
-    if (!dbUser) {
-        throw new Error("No user account found, it may have been deleted");
-    }
-    res.status(200);
-    res.json({ posts: dbUser.posts, comments: dbUser.comments });
-});
-
 const getPostsByQuery = wrapper(async (req, res) => {
     if (!req.params.query || typeof req.params.query !== "string") {
         throw new Error("User did not submit a valid query");
@@ -423,6 +413,7 @@ const deletePost = wrapper(async (req, res) => {
                 user: "Deleted",
                 title: "This post has been deleted",
                 content: "This post has been deleted",
+                urlTitle: "Deleted",
                 previewText: "This post has been deleted",
                 postType: "Text",
                 keywords: [],
@@ -453,7 +444,6 @@ export {
     getPost,
     getHomePosts,
     getPostsByTopic,
-    getPostsByUser,
     likePost,
     savePost,
     getPostsByQuery,

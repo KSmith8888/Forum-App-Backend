@@ -12,6 +12,7 @@ import {
     updateProfileBio,
     updatePassword,
     updateEmail,
+    completeEmailUpdate,
     updateNotificationSetting,
     deleteOwnAccount,
     deleteNotification,
@@ -25,7 +26,7 @@ const usersRouter = express.Router();
 usersRouter.options("*", optionsPreflight);
 usersRouter.get("/details/:username", sanitizeChars, getUserProfile);
 usersRouter.get(
-    "/profile/details/:id",
+    "/profile/details",
     sanitizeChars,
     authorizeUser,
     getOwnProfile
@@ -35,43 +36,39 @@ usersRouter.post("/register", sanitizeChars, registerUser);
 usersRouter.post("/reset", sanitizeChars, resetPassword);
 usersRouter.post("/reset/complete", sanitizeChars, completeReset);
 usersRouter.patch(
-    "/profile/:id/image",
+    "/profile/image",
     sanitizeChars,
     authorizeUser,
     checkIfBanned,
     updateProfilePic
 );
 usersRouter.patch(
-    "/profile/:id/bio",
+    "/profile/bio",
     sanitizeChars,
     authorizeUser,
     checkIfBanned,
     updateProfileBio
 );
 usersRouter.patch(
-    "/profile/:id/password",
+    "/profile/password",
     sanitizeChars,
     authorizeUser,
     updatePassword
 );
+usersRouter.patch("/profile/email", sanitizeChars, authorizeUser, updateEmail);
 usersRouter.patch(
-    "/profile/:id/email",
+    "/profile/email/complete",
     sanitizeChars,
     authorizeUser,
-    updateEmail
+    completeEmailUpdate
 );
 usersRouter.patch(
-    "/profile/:id/notifications",
+    "/profile/notifications",
     sanitizeChars,
     authorizeUser,
     updateNotificationSetting
 );
-usersRouter.delete(
-    "/profile/:id",
-    sanitizeChars,
-    authorizeUser,
-    deleteOwnAccount
-);
+usersRouter.delete("/profile", sanitizeChars, authorizeUser, deleteOwnAccount);
 usersRouter.delete(
     "/profile/notifications/:id",
     sanitizeChars,
