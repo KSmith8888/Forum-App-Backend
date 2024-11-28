@@ -231,19 +231,19 @@ const resetPassword = wrapper(async (req, res) => {
     res.status(200);
     res.json({
         message: "Password reset initiated successfully",
-        userId: String(dbUser._id),
+        username: String(dbUser.username),
     });
 });
 
 const completeReset = wrapper(async (req, res) => {
     const code = req.body.code;
-    const userId = req.body.userId;
+    const username = req.body.username;
     const newPassword = req.body.password;
     const reg = new RegExp("^[a-zA-Z0-9.:,?/_'!@-]+$");
-    if (!code || !userId || !newPassword || !reg.test(newPassword)) {
+    if (!code || !username || !newPassword || !reg.test(newPassword)) {
         throw new Error("Bad Request Error: Reset password info not provided");
     }
-    const dbUser = await User.findOne({ _id: String(userId) });
+    const dbUser = await User.findOne({ username: String(username) });
     if (!dbUser) {
         throw new Error("Bad Request Error: Reset info is not valid");
     }
@@ -258,7 +258,7 @@ const completeReset = wrapper(async (req, res) => {
     const newHash = await bcrypt.hash(String(newPassword), saltRounds);
     const currentDate = new Date();
     await User.findOneAndUpdate(
-        { _id: String(userId) },
+        { _id: dbUser._id },
         {
             $set: {
                 password: newHash,
@@ -492,6 +492,7 @@ const deleteOwnAccount = wrapper(async (req, res) => {
                 title: "This post has been deleted",
                 content: "This post has been deleted",
                 urlTitle: "Deleted",
+                previewText: "This post has been deleted",
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,

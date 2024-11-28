@@ -205,6 +205,7 @@ const deleteUsersPost = wrapper(async (req, res) => {
                 postType: "Text",
                 title: "This post has been deleted",
                 content: "This post has been deleted",
+                urlTitle: "post_deleted",
                 previewText: "This post has been deleted",
                 keywords: [],
                 history: [],
@@ -292,7 +293,9 @@ const deleteUsersAccount = wrapper(async (req, res) => {
             {
                 user: "Deleted",
                 postType: "Text",
+                title: "This post has been deleted",
                 content: "This post has been deleted",
+                urlTitle: "post_deleted",
                 previewText: "This post has been deleted",
                 keywords: [],
                 history: [],
