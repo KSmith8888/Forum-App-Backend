@@ -117,7 +117,6 @@ const createNewUser = wrapper(async (req, res) => {
         subject: "Verify to complete 4em account registration",
         html: `
         <p>Hi ${String(displayName)},</p>
-        <br>
         <p>Use the code below to finish creating your 4em account</p>
         <p>Verification code: <strong>${code}</strong></p>
         <p>This code will expire if not used within 10 minutes</p>
@@ -152,6 +151,18 @@ const registerUser = wrapper(async (req, res) => {
     if (!dbPending) {
         throw new Error("Bad Request Error: Verification info is not valid");
     }
+    if (dbPending.registerAttempts >= 3) {
+        throw new Error("Bad Request Error: Too many registration attempts");
+    }
+    const newAttempts = dbPending.registerAttempts + 1;
+    await PendingUser.findOneAndUpdate(
+        { _id: String(pendingId) },
+        {
+            $set: {
+                registerAttempts: newAttempts,
+            },
+        }
+    );
     if (String(code) !== String(dbPending.verificationCode)) {
         throw new Error("Bad Request Error: Verification code does not match");
     }
@@ -247,12 +258,40 @@ const completeReset = wrapper(async (req, res) => {
     if (!dbUser) {
         throw new Error("Bad Request Error: Reset info is not valid");
     }
-    if (String(code) !== String(dbUser.resetCode)) {
-        throw new Error("Bad Request Error: Reset code does not match");
-    }
     const current = Date.now();
     if (dbUser.resetExpiration < current) {
         throw new Error("Bad Request Error: Reset code has expired");
+    }
+    if (dbUser.loginAttempts >= 3) {
+        if (current < dbUser.frozenUntil) {
+            throw new Error(
+                "Bad Request Error: Attempted reset during account freeze"
+            );
+        } else {
+            await User.findOneAndUpdate(
+                { _id: String(dbUser._id) },
+                {
+                    $set: {
+                        loginAttempts: 0,
+                        frozenUntil: 0,
+                    },
+                }
+            );
+        }
+    }
+    if (String(code) !== String(dbUser.resetCode)) {
+        const newAttempts = dbUser.loginAttempts + 1;
+        const freezeTime = newAttempts >= 3 ? current + 600000 : 0;
+        await User.findOneAndUpdate(
+            { _id: String(dbUser._id) },
+            {
+                $set: {
+                    loginAttempts: newAttempts,
+                    frozenUntil: freezeTime,
+                },
+            }
+        );
+        throw new Error("Bad Request Error: Reset code does not match");
     }
     const saltRounds = 10;
     const newHash = await bcrypt.hash(String(newPassword), saltRounds);
@@ -375,7 +414,9 @@ const updateEmail = wrapper(async (req, res) => {
     if (
         !reg.test(newEmail) ||
         !newEmail.includes("@") ||
-        !newEmail.includes(".")
+        !newEmail.includes(".") ||
+        newEmail.length < 6 ||
+        newEmail.length > 40
     ) {
         throw new Error("Bad Request Error: Invalid email provided");
     }
@@ -442,6 +483,9 @@ const completeEmailUpdate = wrapper(async (req, res) => {
     const current = Date.now();
     if (dbUser.emailExpiration < current) {
         throw new Error("Bad Request Error: Verification code has expired");
+    }
+    if (!dbUser.emailTemp) {
+        throw new Error("Bad Request Error: Invalid email provided");
     }
     await User.findOneAndUpdate(
         { _id: dbUser._id },

@@ -70,7 +70,6 @@ const userSchema = new Schema({
     },
     emailTemp: {
         type: String,
-        required: true,
         default: "",
     },
     emailCode: {

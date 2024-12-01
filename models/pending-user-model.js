@@ -36,6 +36,11 @@ const pendingUserSchema = new Schema({
         type: Number,
         required: true,
     },
+    registerAttempts: {
+        type: Number,
+        required: true,
+        default: 0,
+    },
 });
 
 const PendingUser = model("PendingUser", pendingUserSchema);
