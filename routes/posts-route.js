@@ -1,16 +1,14 @@
 import express from "express";
 
-import {
-    createPost,
-    getPost,
-    getHomePosts,
-    getPostsByTopic,
-    likePost,
-    savePost,
-    getPostsByQuery,
-    editPost,
-    deletePost,
-} from "../controllers/posts-controller.js";
+import { createPost } from "../controllers/post-controllers/create-post.js";
+import { getPost } from "../controllers/post-controllers/get-post.js";
+import { getPostsByTopic } from "../controllers/post-controllers/get-posts-by-topic.js";
+import { getPostsByQuery } from "../controllers/post-controllers/get-posts-by-query.js";
+import { getHomePosts } from "../controllers/post-controllers/get-home-posts.js";
+import { likePost } from "../controllers/post-controllers/like-post.js";
+import { savePost } from "../controllers/post-controllers/save-post.js";
+import { editPost } from "../controllers/post-controllers/edit-post.js";
+import { deletePost } from "../controllers/post-controllers/delete-post.js";
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import { authorizeUser } from "../middleware/authorize.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
