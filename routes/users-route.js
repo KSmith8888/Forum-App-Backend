@@ -1,16 +1,6 @@
 import express from "express";
 
 import { optionsPreflight } from "../controllers/options-preflight.js";
-import {
-    updateProfilePic,
-    updateProfileBio,
-    updatePassword,
-    updateEmail,
-    completeEmailUpdate,
-    updateNotificationSetting,
-    deleteOwnAccount,
-    deleteNotification,
-} from "../controllers/users-controller.js";
 import { getOwnProfile } from "../controllers/user-controllers/get-own-profile.js";
 import { getUserProfile } from "../controllers/user-controllers/get-users-profile.js";
 import { createNewUser } from "../controllers/user-controllers/create-new-user.js";
@@ -18,6 +8,14 @@ import { registerUser } from "../controllers/user-controllers/register-user.js";
 import { attemptLogin } from "../controllers/user-controllers/attempt-login.js";
 import { resetPassword } from "../controllers/user-controllers/reset-password.js";
 import { completeReset } from "../controllers/user-controllers/complete-reset.js";
+import { updateProfilePic } from "../controllers/user-controllers/update-profile-pic.js";
+import { updateProfileBio } from "../controllers/user-controllers/update-profile-bio.js";
+import { updatePassword } from "../controllers/user-controllers/update-password.js";
+import { updateEmail } from "../controllers/user-controllers/update-email.js";
+import { completeEmailUpdate } from "../controllers/user-controllers/complete-email-update.js";
+import { updateReplySetting } from "../controllers/user-controllers/update-reply-setting.js";
+import { deleteOwnAccount } from "../controllers/user-controllers/delete-own-account.js";
+import { deleteNotification } from "../controllers/user-controllers/delete-notification.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
 import { authorizeUser } from "../middleware/authorize.js";
 import { checkIfBanned } from "../middleware/ban-status.js";
@@ -68,7 +66,7 @@ usersRouter.patch(
     "/profile/notifications",
     sanitizeChars,
     authorizeUser,
-    updateNotificationSetting
+    updateReplySetting
 );
 usersRouter.delete("/profile", sanitizeChars, authorizeUser, deleteOwnAccount);
 usersRouter.delete(
