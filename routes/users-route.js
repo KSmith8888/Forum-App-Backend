@@ -2,12 +2,6 @@ import express from "express";
 
 import { optionsPreflight } from "../controllers/options-preflight.js";
 import {
-    getOwnProfile,
-    getUserProfile,
-    createNewUser,
-    registerUser,
-    resetPassword,
-    completeReset,
     updateProfilePic,
     updateProfileBio,
     updatePassword,
@@ -17,6 +11,13 @@ import {
     deleteOwnAccount,
     deleteNotification,
 } from "../controllers/users-controller.js";
+import { getOwnProfile } from "../controllers/user-controllers/get-own-profile.js";
+import { getUserProfile } from "../controllers/user-controllers/get-users-profile.js";
+import { createNewUser } from "../controllers/user-controllers/create-new-user.js";
+import { registerUser } from "../controllers/user-controllers/register-user.js";
+import { attemptLogin } from "../controllers/user-controllers/attempt-login.js";
+import { resetPassword } from "../controllers/user-controllers/reset-password.js";
+import { completeReset } from "../controllers/user-controllers/complete-reset.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
 import { authorizeUser } from "../middleware/authorize.js";
 import { checkIfBanned } from "../middleware/ban-status.js";
@@ -33,6 +34,7 @@ usersRouter.get(
 );
 usersRouter.post("/", sanitizeChars, createNewUser);
 usersRouter.post("/register", sanitizeChars, registerUser);
+usersRouter.post("/login", sanitizeChars, attemptLogin);
 usersRouter.post("/reset", sanitizeChars, resetPassword);
 usersRouter.post("/reset/complete", sanitizeChars, completeReset);
 usersRouter.patch(

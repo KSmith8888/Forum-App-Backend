@@ -1,10 +1,10 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
-import { wrapper } from "./wrapper.js";
-import { User } from "../models/user-model.js";
+import { wrapper } from "../wrapper.js";
+import { User } from "../../models/user-model.js";
 
-const attemptLogin = wrapper(async (req, res) => {
+export const attemptLogin = wrapper(async (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     const attemptUsername = req.body.username;
     const attemptPassword = req.body.password;
@@ -91,5 +91,3 @@ const attemptLogin = wrapper(async (req, res) => {
         token,
     });
 });
-
-export { attemptLogin };

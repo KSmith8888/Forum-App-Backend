@@ -1,7 +1,6 @@
 import express from "express";
 import rateLimit from "express-rate-limit";
 
-import { loginRouter } from "./routes/login-route.js";
 import { postsRouter } from "./routes/posts-route.js";
 import { usersRouter } from "./routes/users-route.js";
 import { commentsRouter } from "./routes/comments-route.js";
@@ -54,9 +53,8 @@ app.use((req, res, next) => {
 app.use(limiter);
 app.use(express.json());
 
-app.use("/api/v1/login", loginRouter);
-app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/users", usersRouter);
+app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("/api/v1/moderation", moderationRouter);
 app.use("*", (req, res) => {
