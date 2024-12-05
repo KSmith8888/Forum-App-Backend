@@ -1,4 +1,4 @@
-import { wrapper } from ".././wrapper.js";
+import { wrapper } from "../wrapper.js";
 import { Comment } from "../../models/comment-model.js";
 import { Post } from "../../models/post-model.js";
 import { User } from "../../models/user-model.js";
@@ -9,8 +9,9 @@ export const createComment = wrapper(async (req, res) => {
     const postId = req.body.postId;
     const commentId = req.body.commentId;
     const replyType = req.body.replyType;
-    if (!content || !postId || !replyType) {
-        throw new Error("Bad Request Error: Content or post id not provided");
+    const postUrlTitle = req.body.postUrlTitle;
+    if (!content || !postId || !replyType || !postUrlTitle) {
+        throw new Error("Bad Request Error: Comment info not provided");
     }
     if (typeof content !== "string") {
         throw new Error("Bad Request Error: Invalid content provided");
@@ -26,6 +27,7 @@ export const createComment = wrapper(async (req, res) => {
         content: String(content),
         previewText: String(preview),
         relatedPost: String(postId),
+        postUrlTitle: String(postUrlTitle),
         commentReply: isCommentReply,
         user: dbUser.displayName,
         profileImageName: dbUser.profileImageName,

@@ -1,4 +1,4 @@
-import { wrapper } from ".././wrapper.js";
+import { wrapper } from "../wrapper.js";
 import { Comment } from "../../models/comment-model.js";
 
 export const getComment = wrapper(async (req, res) => {
@@ -10,5 +10,8 @@ export const getComment = wrapper(async (req, res) => {
         );
     }
     res.status(200);
-    res.json(requestedComment);
+    res.json({
+        content: requestedComment.content,
+        message: "Comment found successfully",
+    });
 });

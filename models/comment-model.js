@@ -31,6 +31,11 @@ const commentSchema = new Schema(
             type: String,
             required: true,
         },
+        postUrlTitle: {
+            type: String,
+            required: true,
+            default: "url_title",
+        },
         hasBeenEdited: {
             type: Boolean,
             required: true,
