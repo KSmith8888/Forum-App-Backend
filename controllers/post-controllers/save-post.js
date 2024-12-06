@@ -1,4 +1,4 @@
-import { wrapper } from ".././wrapper.js";
+import { wrapper } from "../wrapper.js";
 import { User } from "../../models/user-model.js";
 
 export const savePost = wrapper(async (req, res) => {

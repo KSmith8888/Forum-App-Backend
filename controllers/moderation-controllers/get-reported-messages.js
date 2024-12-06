@@ -1,4 +1,4 @@
-import { wrapper } from ".././wrapper.js";
+import { wrapper } from "../wrapper.js";
 import { Report } from "../../models/report-model.js";
 
 export const getReportedMessages = wrapper(async (req, res) => {

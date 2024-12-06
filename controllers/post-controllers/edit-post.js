@@ -1,4 +1,4 @@
-import { wrapper } from ".././wrapper.js";
+import { wrapper } from "../wrapper.js";
 import { Post } from "../../models/post-model.js";
 import { User } from "../../models/user-model.js";
 
@@ -46,6 +46,7 @@ export const editPost = wrapper(async (req, res) => {
             return {
                 title: dbPost.title,
                 previewText: preview,
+                urlTitle: dbPost.urlTitle,
                 postId: postId,
             };
         } else {
