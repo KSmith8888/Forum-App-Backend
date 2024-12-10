@@ -137,6 +137,11 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
+    votedPosts: {
+        type: [String],
+        required: true,
+        default: [],
+    },
     likedComments: {
         type: [String],
         required: true,

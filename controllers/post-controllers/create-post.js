@@ -27,7 +27,7 @@ export const createPost = wrapper(async (req, res) => {
             "Bad Request Error: Only admins are allowed to pin posts"
         );
     }
-    if (postType !== "Text" && postType !== "Link") {
+    if (postType !== "Text" && postType !== "Link" && postType !== "Poll") {
         throw new Error("Bad Request Error: Post type is not valid");
     }
     if (postType === "Link") {
@@ -40,6 +40,16 @@ export const createPost = wrapper(async (req, res) => {
             !content.includes(".")
         ) {
             throw new Error("Bad Request Error: Invalid link provided");
+        }
+    }
+    let pollData = [];
+    if (postType === "Poll") {
+        const options = content.split(",");
+        if (options.length < 2 || options.length > 4) {
+            throw new Error("Bad Request Error: Invalid poll data provided");
+        }
+        for (const option of options) {
+            pollData.push({ option: option, votes: 0 });
         }
     }
     if (keywordString && typeof keywordString !== "string") {
@@ -96,6 +106,7 @@ export const createPost = wrapper(async (req, res) => {
         topic: String(topic),
         user: dbUser.displayName,
         keywords: keywords,
+        pollData: pollData,
         profileImageName: dbUser.profileImageName,
         profileImageAlt: dbUser.profileImageAlt,
     });

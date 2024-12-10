@@ -57,6 +57,17 @@ const postSchema = new Schema(
             required: true,
             default: [],
         },
+        pollData: {
+            type: [
+                {
+                    option: { type: String, required: true },
+                    votes: { type: Number, required: true },
+                    _id: false,
+                },
+            ],
+            required: true,
+            default: [],
+        },
         comments: {
             type: [String],
             required: true,
