@@ -10,14 +10,6 @@ export const getPost = wrapper(async (req, res) => {
             "Not Found Error: No post found with that id, it may have been deleted"
         );
     }
-    /*
-    const relatedComments = [];
-    const commentIds = requestedPost.comments;
-    for (const id of commentIds) {
-        const matching = await Comment.findOne({ _id: String(id) });
-        relatedComments.push(matching);
-    }
-    */
     const commentIds = requestedPost.comments;
     const relatedComments = await Comment.find({ _id: { $in: commentIds } });
     res.status(200);

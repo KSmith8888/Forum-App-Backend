@@ -38,6 +38,7 @@ export const createComment = wrapper(async (req, res) => {
             commentId: String(dbComment._id),
             previewText: String(preview),
             relatedPost: dbComment.relatedPost,
+            postUrlTitle: String(postUrlTitle),
         },
         ...dbUser.comments,
     ];

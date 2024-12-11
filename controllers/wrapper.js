@@ -35,11 +35,10 @@ const wrapper = (fn) => {
                     message:
                         "Sorry, that username is not available. Please choose a different username",
                 });
-            } else if (err.message.startsWith("Email Not Verified Error:")) {
-                res.status(403);
+            } else if (err.message.startsWith("Poll multiple vote Error:")) {
+                res.status(400);
                 res.json({
-                    message:
-                        "You must verify this email address before attempting a password reset",
+                    message: "Users can only vote in a poll once",
                 });
             } else if (err.message.startsWith("Limit Exceeded Error:")) {
                 res.status(429);

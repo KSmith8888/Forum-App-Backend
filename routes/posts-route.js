@@ -7,6 +7,7 @@ import { getPostsByQuery } from "../controllers/post-controllers/get-posts-by-qu
 import { getHomePosts } from "../controllers/post-controllers/get-home-posts.js";
 import { likePost } from "../controllers/post-controllers/like-post.js";
 import { savePost } from "../controllers/post-controllers/save-post.js";
+import { voteInPoll } from "../controllers/post-controllers/vote-in-poll.js";
 import { editPost } from "../controllers/post-controllers/edit-post.js";
 import { deletePost } from "../controllers/post-controllers/delete-post.js";
 import { optionsPreflight } from "../controllers/options-preflight.js";
@@ -30,6 +31,7 @@ postsRouter.post(
 );
 postsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likePost);
 postsRouter.patch("/save/:id", sanitizeChars, authorizeUser, savePost);
+postsRouter.patch("/vote/:id", sanitizeChars, authorizeUser, voteInPoll);
 postsRouter.patch(
     "/:id",
     sanitizeChars,
