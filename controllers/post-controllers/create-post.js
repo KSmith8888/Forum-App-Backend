@@ -4,20 +4,28 @@ import { User } from "../../models/user-model.js";
 
 export const createPost = wrapper(async (req, res) => {
     const topic = req.body.topic.toLowerCase();
-    const title = req.body.title;
-    const content = req.body.content;
+    const initTitle = req.body.title;
+    const initContent = req.body.content;
     const postType = req.body.postType;
     const isPinned = req.body.isPinned === "pinned" ? true : false;
     const keywordString = req.body.keywords;
     const strictReg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%-]+$");
     if (
         !topic ||
-        !title ||
-        !content ||
+        !initTitle ||
+        !initContent ||
         !postType ||
-        typeof content !== "string" ||
-        !strictReg.test(title)
+        typeof initTitle !== "string" ||
+        typeof initContent !== "string" ||
+        !strictReg.test(initTitle)
     ) {
+        throw new Error(
+            "Bad Request Error: Post info not provided or not in correct format"
+        );
+    }
+    const title = initTitle.trim();
+    const content = initContent.trim();
+    if (title.length < 8 || content.length < 12) {
         throw new Error(
             "Bad Request Error: Post info not provided or not in correct format"
         );
@@ -45,11 +53,21 @@ export const createPost = wrapper(async (req, res) => {
     let pollData = [];
     if (postType === "Poll") {
         const options = content.split(",");
-        if (options.length < 2 || options.length > 4) {
+        if (
+            options.length < 2 ||
+            options.length > 6 ||
+            !strictReg.test(content)
+        ) {
             throw new Error("Bad Request Error: Invalid poll data provided");
         }
         for (const option of options) {
-            pollData.push({ option: option, votes: 0 });
+            const trimmed = option.trim();
+            if (trimmed.length < 5) {
+                throw new Error(
+                    "Bad Request Error: Invalid poll data provided"
+                );
+            }
+            pollData.push({ option: trimmed, votes: 0 });
         }
     }
     if (keywordString && typeof keywordString !== "string") {

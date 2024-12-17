@@ -21,6 +21,7 @@ export const deletePost = wrapper(async (req, res) => {
                 urlTitle: "post_deleted",
                 previewText: "This post has been deleted",
                 postType: "Text",
+                pollData: [],
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,

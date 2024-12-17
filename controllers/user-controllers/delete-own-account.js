@@ -18,6 +18,7 @@ export const deleteOwnAccount = wrapper(async (req, res) => {
                 content: "This post has been deleted",
                 urlTitle: "Deleted",
                 previewText: "This post has been deleted",
+                pollData: [],
                 keywords: [],
                 history: [],
                 hasBeenEdited: false,
