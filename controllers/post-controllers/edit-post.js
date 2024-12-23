@@ -18,6 +18,38 @@ export const editPost = wrapper(async (req, res) => {
     if (!newPostContent || typeof newPostContent !== "string") {
         throw new Error("No post content or invalid post content was provided");
     }
+    if (dbPost.postType === "Link") {
+        const linkReg = new RegExp("^[a-zA-Z0-9?&=@.:/_-]+$");
+        const isValid = URL.canParse(newPostContent);
+        if (
+            !newPostContent.startsWith("https://") ||
+            !isValid ||
+            !linkReg.test(newPostContent) ||
+            !newPostContent.includes(".")
+        ) {
+            throw new Error("Bad Request Error: Invalid link provided");
+        }
+    }
+    let pollData = [];
+    if (dbPost.postType === "Poll") {
+        const options = newPostContent.split(",");
+        if (
+            options.length < 2 ||
+            options.length > 6 ||
+            !strictReg.test(newPostContent)
+        ) {
+            throw new Error("Bad Request Error: Invalid poll data provided");
+        }
+        for (const option of options) {
+            const trimmed = option.trim();
+            if (trimmed.length < 2) {
+                throw new Error(
+                    "Bad Request Error: Invalid poll data provided"
+                );
+            }
+            pollData.push({ option: trimmed, votes: 0 });
+        }
+    }
     const dbUser = await User.findOne({ _id: String(req.userId) });
     const userPostIds = dbUser.posts.map((postObj) => {
         return String(postObj.postId);
@@ -70,6 +102,7 @@ export const editPost = wrapper(async (req, res) => {
                 hasBeenEdited: true,
                 lastEditedAt: String(currentDate),
                 history: [...prevPostHistory, prevPostVersion],
+                pollData: pollData,
             },
         }
     );
