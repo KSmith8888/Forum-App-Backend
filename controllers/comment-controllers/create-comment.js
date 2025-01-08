@@ -61,9 +61,9 @@ export const createComment = wrapper(async (req, res) => {
                 "Bad Request Error: No comment id passed for reply"
             );
         }
-        let newReplyComments = dbMessage.comments.slice(0, commentIndex + 1);
+        const newReplyComments = dbMessage.comments.slice(0, commentIndex + 1);
         newReplyComments.push(dbComment._id);
-        let remainingComments = dbMessage.comments.splice(commentIndex + 1);
+        const remainingComments = dbMessage.comments.splice(commentIndex + 1);
         newReplyComments.push(...remainingComments);
         newPostComments = newReplyComments;
     }

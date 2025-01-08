@@ -30,9 +30,10 @@ export const editPost = wrapper(async (req, res) => {
             throw new Error("Bad Request Error: Invalid link provided");
         }
     }
-    let pollData = [];
+    const pollData = [];
     if (dbPost.postType === "Poll") {
         const options = newPostContent.split(",");
+        const strictReg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%-]+$");
         if (
             options.length < 2 ||
             options.length > 6 ||

@@ -50,7 +50,7 @@ export const createPost = wrapper(async (req, res) => {
             throw new Error("Bad Request Error: Invalid link provided");
         }
     }
-    let pollData = [];
+    const pollData = [];
     if (postType === "Poll") {
         const options = content.split(",");
         if (
@@ -62,7 +62,7 @@ export const createPost = wrapper(async (req, res) => {
         }
         for (const option of options) {
             const trimmed = option.trim();
-            if (trimmed.length < 5) {
+            if (trimmed.length < 2) {
                 throw new Error(
                     "Bad Request Error: Invalid poll data provided"
                 );

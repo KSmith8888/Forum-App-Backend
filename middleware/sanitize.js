@@ -1,6 +1,6 @@
 function sanitizeChars(req, res, next) {
     try {
-        const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%\r\n-]+$");
+        const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%\\r\\n-]+$");
         const paramReg = new RegExp("^[a-zA-Z0-9 _]+$");
         const paramValues = Object.values(req.params);
         for (const param of paramValues) {
@@ -9,7 +9,7 @@ function sanitizeChars(req, res, next) {
             }
         }
         const bodyValues = Object.values(req.body);
-        for (let value of bodyValues) {
+        for (const value of bodyValues) {
             if (typeof value !== "string" && typeof value !== "number") {
                 throw new Error("User input not valid: Not accepted type");
             }

@@ -20,7 +20,7 @@ export const deleteUsersAccount = wrapper(async (req, res) => {
     if (dbUser.role === "admin") {
         throw new Error("Admin accounts cannot be deleted");
     }
-    if (dbUser.role === "mod" && role !== "admin") {
+    if (dbUser.role === "mod" && req.role !== "admin") {
         throw new Error("Mod accounts can only be deleted by an admin");
     }
     const userPostIds = dbUser.posts.map((postObj) => {
