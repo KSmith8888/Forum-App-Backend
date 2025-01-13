@@ -21,7 +21,13 @@ commentsRouter.post(
     checkIfBanned,
     createComment
 );
-commentsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likeComment);
+commentsRouter.patch(
+    "/likes/:id",
+    sanitizeChars,
+    authorizeUser,
+    checkIfBanned,
+    likeComment
+);
 commentsRouter.patch(
     "/:id",
     sanitizeChars,

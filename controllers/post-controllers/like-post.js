@@ -6,6 +6,9 @@ import { Notification } from "../../models/notification-model.js";
 export const likePost = wrapper(async (req, res) => {
     const postId = req.params.id;
     const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.likedPosts.length > 50) {
+        throw new Error("Limit Exceeded Error: Liked post limit exceeded");
+    }
     //Did user like post or unlike
     let didUserLike = true;
     let newLikedPosts = [];

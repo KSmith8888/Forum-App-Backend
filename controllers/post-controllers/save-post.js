@@ -6,6 +6,9 @@ export const savePost = wrapper(async (req, res) => {
     const postTitle = req.body.postTitle;
     const postUrlTitle = req.body.urlTitle;
     const dbUser = await User.findOne({ _id: String(req.userId) });
+    if (dbUser.savedPosts.length > 50) {
+        throw new Error("Limit Exceeded Error: Saved post limit exceeded");
+    }
     //Did user save post or unsave
     let didUserSave = true;
     let newSavedPosts = [];

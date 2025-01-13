@@ -29,9 +29,21 @@ postsRouter.post(
     checkIfBanned,
     createPost
 );
-postsRouter.patch("/likes/:id", sanitizeChars, authorizeUser, likePost);
+postsRouter.patch(
+    "/likes/:id",
+    sanitizeChars,
+    authorizeUser,
+    checkIfBanned,
+    likePost
+);
 postsRouter.patch("/save/:id", sanitizeChars, authorizeUser, savePost);
-postsRouter.patch("/vote/:id", sanitizeChars, authorizeUser, voteInPoll);
+postsRouter.patch(
+    "/vote/:id",
+    sanitizeChars,
+    authorizeUser,
+    checkIfBanned,
+    voteInPoll
+);
 postsRouter.patch(
     "/:id",
     sanitizeChars,
