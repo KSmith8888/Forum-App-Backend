@@ -73,6 +73,11 @@ const postSchema = new Schema(
             required: true,
             default: [],
         },
+        isNSFW: {
+            type: Boolean,
+            required: true,
+            default: false,
+        },
         isPinned: {
             type: Boolean,
             required: true,

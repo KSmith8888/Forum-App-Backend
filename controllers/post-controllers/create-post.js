@@ -7,6 +7,7 @@ export const createPost = wrapper(async (req, res) => {
     const initTitle = req.body.title;
     const initContent = req.body.content;
     const postType = req.body.postType;
+    const isNSFW = req.body.isNSFW === "nsfw" ? true : false;
     const isPinned = req.body.isPinned === "pinned" ? true : false;
     const keywordString = req.body.keywords;
     const strictReg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%-]+$");
@@ -112,14 +113,18 @@ export const createPost = wrapper(async (req, res) => {
         fullUrlTitle.length > 8
             ? fullUrlTitle.slice(0, 30).toLowerCase()
             : `${topic}_post`;
-    const preview =
+    let preview =
         content.length < 50 ? content : `${content.substring(0, 50)}...`;
+    if (isNSFW) {
+        preview = "This post has been marked NSFW";
+    }
     const dbPost = await Post.create({
         title: String(title),
         postType: String(postType),
         content: String(content),
         urlTitle: String(urlTitle),
         previewText: String(preview),
+        isNSFW,
         isPinned,
         topic: String(topic),
         user: dbUser.displayName,
