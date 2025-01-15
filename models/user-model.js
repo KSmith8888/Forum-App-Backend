@@ -152,10 +152,25 @@ const userSchema = new Schema({
         required: true,
         default: [],
     },
-    getReplyNotifications: {
-        type: Boolean,
+    profileSettings: {
+        type: {
+            getReplyNotifications: {
+                type: Boolean,
+                required: true,
+                default: true,
+            },
+            viewNSFW: {
+                type: Boolean,
+                required: true,
+                default: true,
+            },
+            _id: false,
+        },
         required: true,
-        default: true,
+        default: {
+            getReplyNotifications: true,
+            viewNSFW: true,
+        },
     },
     profileBio: {
         type: String,

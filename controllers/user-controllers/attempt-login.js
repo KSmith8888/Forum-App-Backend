@@ -88,6 +88,7 @@ export const attemptLogin = wrapper(async (req, res) => {
         savedPosts: dbUser.savedPosts,
         likedPosts: dbUser.likedPosts,
         likedComments: dbUser.likedComments,
+        viewNSFW: dbUser.profileSettings.viewNSFW,
         token,
     });
 });

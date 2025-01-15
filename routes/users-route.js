@@ -14,6 +14,7 @@ import { updatePassword } from "../controllers/user-controllers/update-password.
 import { updateEmail } from "../controllers/user-controllers/update-email.js";
 import { completeEmailUpdate } from "../controllers/user-controllers/complete-email-update.js";
 import { updateReplySetting } from "../controllers/user-controllers/update-reply-setting.js";
+import { updateNsfwSetting } from "../controllers/user-controllers/update-nsfw-setting.js";
 import { deleteOwnAccount } from "../controllers/user-controllers/delete-own-account.js";
 import { deleteNotification } from "../controllers/user-controllers/delete-notification.js";
 import { sanitizeChars } from "../middleware/sanitize.js";
@@ -67,6 +68,12 @@ usersRouter.patch(
     sanitizeChars,
     authorizeUser,
     updateReplySetting
+);
+usersRouter.patch(
+    "/profile/nsfw",
+    sanitizeChars,
+    authorizeUser,
+    updateNsfwSetting
 );
 usersRouter.delete("/profile", sanitizeChars, authorizeUser, deleteOwnAccount);
 usersRouter.delete(

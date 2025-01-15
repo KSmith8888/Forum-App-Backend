@@ -19,7 +19,7 @@ export const getOwnProfile = wrapper(async (req, res) => {
         notifications: userNotifications.reverse(),
         bio: dbUser.profileBio,
         pswdLastUpdated: dbUser.pswdLastUpdated,
-        replySetting: dbUser.getReplyNotifications,
+        profileSettings: dbUser.profileSettings,
         email: dbUser.email,
         verifiedEmail: dbUser.verifiedEmail,
     });
