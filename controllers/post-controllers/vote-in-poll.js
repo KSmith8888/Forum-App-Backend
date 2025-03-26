@@ -14,15 +14,10 @@ export const voteInPoll = wrapper(async (req, res) => {
     if (!pollVote) {
         throw new Error("Bad Request Error: No vote data provided");
     }
-    if (
-        pollVote !== "0" &&
-        pollVote !== "1" &&
-        pollVote !== "2" &&
-        pollVote !== "3"
-    ) {
+    const voteIndex = parseInt(pollVote, 10);
+    if (typeof voteIndex !== "number" || voteIndex < 0 || voteIndex > 6) {
         throw new Error("Bad Request Error: Invalid vote data provided");
     }
-    const voteIndex = parseInt(pollVote, 10);
     const dbPost = await Post.findOne({ _id: String(postId) });
     if (!dbPost || dbPost.postType !== "Poll") {
         throw new Error("No poll post found matching that id");
