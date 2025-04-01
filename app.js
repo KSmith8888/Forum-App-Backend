@@ -57,7 +57,8 @@ app.use("/api/v1/users", usersRouter);
 app.use("/api/v1/posts", postsRouter);
 app.use("/api/v1/comments", commentsRouter);
 app.use("/api/v1/moderation", moderationRouter);
-app.use("*", (req, res) => {
+
+app.use("/*wildcard", (req, res) => {
     res.header("Access-Control-Allow-Origin", process.env.FRONTEND_ORIGIN);
     res.status(404);
     res.json({ message: "The requested resource does not exist" });

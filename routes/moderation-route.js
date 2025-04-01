@@ -17,7 +17,7 @@ import { checkIfBanned } from "../middleware/ban-status.js";
 
 const moderationRouter = express.Router();
 
-moderationRouter.options("*", optionsPreflight);
+moderationRouter.options("/*wildcard", optionsPreflight);
 moderationRouter.get(
     "/report",
     sanitizeChars,

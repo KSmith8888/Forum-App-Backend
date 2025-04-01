@@ -23,7 +23,7 @@ import { checkIfBanned } from "../middleware/ban-status.js";
 
 const usersRouter = express.Router();
 
-usersRouter.options("*", optionsPreflight);
+usersRouter.options("/*wildcard", optionsPreflight);
 usersRouter.get("/details/:username", sanitizeChars, getUserProfile);
 usersRouter.get(
     "/profile/details",

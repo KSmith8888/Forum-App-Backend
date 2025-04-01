@@ -12,7 +12,7 @@ import { checkIfBanned } from "../middleware/ban-status.js";
 
 const commentsRouter = express.Router();
 
-commentsRouter.options("*", optionsPreflight);
+commentsRouter.options("/*wildcard", optionsPreflight);
 commentsRouter.get("/:id", sanitizeChars, getComment);
 commentsRouter.post(
     "/create",

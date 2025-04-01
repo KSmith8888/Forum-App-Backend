@@ -17,7 +17,7 @@ import { checkIfBanned } from "../middleware/ban-status.js";
 
 const postsRouter = express.Router();
 
-postsRouter.options("*", optionsPreflight);
+postsRouter.options("/*wildcard", optionsPreflight);
 postsRouter.get("/home/", getHomePosts);
 postsRouter.get("/topics/:topic", sanitizeChars, getPostsByTopic);
 postsRouter.get("/search/:query", sanitizeChars, getPostsByQuery);

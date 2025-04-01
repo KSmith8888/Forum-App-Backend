@@ -2,13 +2,13 @@ function sanitizeChars(req, res, next) {
     try {
         const reg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%\\r\\n-]+$");
         const paramReg = new RegExp("^[a-zA-Z0-9 _]+$");
-        const paramValues = Object.values(req.params);
+        const paramValues = req.params ? Object.values(req.params) : [];
         for (const param of paramValues) {
             if (typeof param !== "string" || !paramReg.test(param)) {
                 throw new Error("Param text is not valid");
             }
         }
-        const bodyValues = Object.values(req.body);
+        const bodyValues = req.body ? Object.values(req.body) : [];
         for (const value of bodyValues) {
             if (typeof value !== "string" && typeof value !== "number") {
                 throw new Error("User input not valid: Not accepted type");
