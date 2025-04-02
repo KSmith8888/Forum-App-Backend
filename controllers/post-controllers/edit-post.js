@@ -18,6 +18,9 @@ export const editPost = wrapper(async (req, res) => {
     if (!newPostContent || typeof newPostContent !== "string") {
         throw new Error("No post content or invalid post content was provided");
     }
+    if (dbPost.postType === "Poll") {
+        throw new Error("Poll Edit Error: Cannot edit poll type posts");
+    }
     if (dbPost.postType === "Link") {
         const linkReg = new RegExp("^[a-zA-Z0-9?&=@.:/_-]+$");
         const isValid = URL.canParse(newPostContent);
@@ -28,27 +31,6 @@ export const editPost = wrapper(async (req, res) => {
             !newPostContent.includes(".")
         ) {
             throw new Error("Bad Request Error: Invalid link provided");
-        }
-    }
-    const pollData = [];
-    if (dbPost.postType === "Poll") {
-        const options = newPostContent.split(",");
-        const strictReg = new RegExp("^[a-zA-Z0-9 .:,?/_'!@=%-]+$");
-        if (
-            options.length < 2 ||
-            options.length > 6 ||
-            !strictReg.test(newPostContent)
-        ) {
-            throw new Error("Bad Request Error: Invalid poll data provided");
-        }
-        for (const option of options) {
-            const trimmed = option.trim();
-            if (trimmed.length < 2) {
-                throw new Error(
-                    "Bad Request Error: Invalid poll data provided"
-                );
-            }
-            pollData.push({ option: trimmed, votes: 0 });
         }
     }
     const dbUser = await User.findOne({ _id: String(req.userId) });
@@ -103,7 +85,6 @@ export const editPost = wrapper(async (req, res) => {
                 hasBeenEdited: true,
                 lastEditedAt: String(currentDate),
                 history: [...prevPostHistory, prevPostVersion],
-                pollData: pollData,
             },
         }
     );

@@ -45,6 +45,12 @@ const wrapper = (fn) => {
                 res.json({
                     message: "Limit exceeded. Too many posts or comments",
                 });
+            } else if (err.message.startsWith("Poll Edit Error:")) {
+                res.status(400);
+                res.json({
+                    message:
+                        "Polls cannot be edited. Create a new poll instead",
+                });
             } else {
                 res.status(500);
                 res.json({
