@@ -10,7 +10,6 @@ const reportSchema = new Schema(
         postUrlTitle: {
             type: String,
             required: true,
-            default: "url_title",
         },
         messageType: {
             type: String,

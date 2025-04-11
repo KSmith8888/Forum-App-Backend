@@ -6,7 +6,8 @@ export const reportMessage = wrapper(async (req, res) => {
         !req.body.reportId ||
         !req.body.reportType ||
         !req.body.reportRelated ||
-        !req.body.reportContent
+        !req.body.reportContent ||
+        !req.body.reportUrlTitle
     ) {
         throw new Error(
             "Bad Request Error: Reported message info not provided"
@@ -14,6 +15,7 @@ export const reportMessage = wrapper(async (req, res) => {
     }
     await Report.create({
         messageId: String(req.body.reportId),
+        postUrlTitle: String(req.body.reportUrlTitle),
         messageType: String(req.body.reportType),
         messageContent: String(req.body.reportContent),
         reportedBy: String(req.username),
