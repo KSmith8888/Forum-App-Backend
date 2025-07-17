@@ -4,7 +4,7 @@
     "description": "The backend of a forum/social media app made with the MERN stack",
     "main": "index.js",
     "type": "module",
-    "private": "true",
+    "license": "MIT",
     "engines": {
         "node": ">=22.13.1"
     },

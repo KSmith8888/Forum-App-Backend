@@ -14,11 +14,11 @@ jsonwebtoken:
 https://github.com/auth0/node-jsonwebtoken  
 mongoose:  
 https://github.com/Automattic/mongoose  
-dotenv:  
-https://github.com/motdotla/dotenv  
 express-rate-limit:  
 https://github.com/express-rate-limit/express-rate-limit  
 eslint:  
 https://github.com/eslint/eslint  
-nodemon:  
-https://github.com/remy/nodemon
+nodemailer:  
+https://github.com/nodemailer/nodemailer  
+globals:  
+https://github.com/sindresorhus/globals
