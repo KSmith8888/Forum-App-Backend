@@ -31,7 +31,7 @@ usersRouter.get(
     authorizeUser,
     getOwnProfile
 );
-usersRouter.post("/", sanitizeChars, createNewUser);
+usersRouter.post("/create", sanitizeChars, createNewUser);
 usersRouter.post("/register", sanitizeChars, registerUser);
 usersRouter.post("/login", sanitizeChars, attemptLogin);
 usersRouter.post("/reset", sanitizeChars, resetPassword);
